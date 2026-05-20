@@ -16,6 +16,8 @@ export interface ProgrammeCardData {
   logoUrl?: string | null;
   type: string;
   location: string;
+  country?: string | null;
+  currency?: string | null;
   isRemote: boolean;
   sectors: string[];
   stages: string[];
@@ -78,7 +80,7 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
             </span>
             <span className="flex items-center gap-0.5 text-xs text-zinc-500">
               <MapPin className="h-3 w-3" />
-              {p.location}{p.isRemote && " · Remote"}
+              {p.location}{p.country && p.country !== "UK" && `, ${p.country}`}{p.isRemote && " · Remote"}
             </span>
           </div>
         </div>
@@ -111,7 +113,7 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
       <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-zinc-800 pt-4 text-xs">
         <div className="flex items-center gap-1.5 text-zinc-400">
           <TrendingUp className="h-3.5 w-3.5 text-zinc-600" />
-          <span>{formatInvestment(p.investmentMin, p.investmentMax)}</span>
+          <span>{formatInvestment(p.investmentMin, p.investmentMax, p.currency ?? "GBP")}</span>
         </div>
         <div className="flex items-center gap-1.5 text-zinc-400">
           <span className="text-zinc-600">Equity:</span>

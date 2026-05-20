@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback } from "react";
 import { Search, X } from "lucide-react";
-import { SECTORS, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS } from "@/lib/constants";
+import { SECTORS, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 
 const TYPES = Object.entries(TYPE_LABELS);
 const STAGES = Object.entries(STAGE_LABELS);
@@ -31,12 +31,17 @@ export function FilterBar() {
   const type = params.get("type") ?? "";
   const sector = params.get("sector") ?? "";
   const stage = params.get("stage") ?? "";
+  const country = params.get("country") ?? "";
   const location = params.get("location") ?? "";
   const seis = params.get("seis") === "1";
   const eis = params.get("eis") === "1";
   const remote = params.get("remote") === "1";
 
-  const hasFilters = type || sector || stage || location || seis || eis || remote;
+  const hasFilters = type || sector || stage || country || location || seis || eis || remote;
+
+  const citiesForCountry = country && CITIES_BY_COUNTRY[country]
+    ? CITIES_BY_COUNTRY[country]
+    : UK_LOCATIONS as unknown as string[];
 
   function clearAll() {
     router.push(pathname + (q ? `?q=${q}` : ""));
@@ -114,16 +119,35 @@ export function FilterBar() {
         </select>
       </div>
 
-      {/* Location */}
+      {/* Country */}
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Location</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Country</p>
+        <select
+          value={country}
+          onChange={(e) => {
+            set("country", e.target.value || null);
+            // Clear city when country changes
+            if (location) set("location", null);
+          }}
+          className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-300 focus:border-indigo-500 focus:outline-none"
+        >
+          <option value="">All countries</option>
+          {EUROPEAN_COUNTRIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* City */}
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">City</p>
         <select
           value={location}
           onChange={(e) => set("location", e.target.value || null)}
           className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-300 focus:border-indigo-500 focus:outline-none"
         >
-          <option value="">All UK</option>
-          {UK_LOCATIONS.map((l) => (
+          <option value="">{country ? `All ${country}` : "All locations"}</option>
+          {citiesForCountry.map((l) => (
             <option key={l} value={l}>{l}</option>
           ))}
         </select>

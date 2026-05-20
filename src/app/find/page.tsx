@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowLeft, Sparkles, CheckCircle, MapPin, ExternalLink } from "lucide-react";
-import { SECTORS, TYPE_LABELS } from "@/lib/constants";
+import { ArrowRight, ArrowLeft, Sparkles, CheckCircle, MapPin, ExternalLink, Mail } from "lucide-react";
+import { SECTORS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const STAGES = [
@@ -20,15 +20,6 @@ const PRIORITIES = [
   { value: "equity_free", label: "Equity-free", desc: "I don't want to give up any equity" },
 ];
 
-const LOCATIONS = [
-  { value: "london", label: "London" },
-  { value: "manchester", label: "Manchester" },
-  { value: "bristol", label: "Bristol" },
-  { value: "edinburgh", label: "Edinburgh" },
-  { value: "cambridge", label: "Cambridge" },
-  { value: "uk_wide", label: "UK-wide / Remote" },
-];
-
 const SEIS_OPTIONS = [
   { value: "yes", label: "Yes", desc: "SEIS eligibility is important for my fundraise" },
   { value: "no", label: "No", desc: "I don't need SEIS" },
@@ -39,7 +30,8 @@ interface WizardAnswers {
   stage: string;
   sectors: string[];
   priority: string;
-  location: string;
+  country: string;
+  city: string;
   seisNeeded: string;
 }
 
@@ -50,6 +42,8 @@ interface MatchResult {
   type: string;
   description: string;
   location: string;
+  country: string;
+  currency: string;
   investmentMin: number | null;
   investmentMax: number | null;
   matchScore: number;
@@ -72,21 +66,15 @@ function StepHeader({ step, total }: { step: number; total: number }) {
           />
         ))}
       </div>
-      <p className="text-xs text-zinc-500">
-        Step {step} of {total}
-      </p>
+      <p className="text-xs text-zinc-500">Step {step} of {total}</p>
     </div>
   );
 }
 
 function OptionCard({
-  selected,
-  onClick,
-  children,
+  selected, onClick, children,
 }: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
+  selected: boolean; onClick: () => void; children: React.ReactNode;
 }) {
   return (
     <button
@@ -103,9 +91,10 @@ function OptionCard({
   );
 }
 
-function formatInv(min: number | null, max: number | null): string {
+function formatInv(min: number | null, max: number | null, currency = "GBP"): string {
   if (!min && !max) return "Undisclosed";
-  const fmt = (n: number) => (n >= 1000000 ? `£${(n / 1000000).toFixed(1)}m` : `£${(n / 1000).toFixed(0)}k`);
+  const sym = currency === "EUR" ? "€" : currency === "USD" ? "$" : "£";
+  const fmt = (n: number) => n >= 1000000 ? `${sym}${(n / 1000000).toFixed(1)}m` : `${sym}${(n / 1000).toFixed(0)}k`;
   if (min && max) return `${fmt(min)}–${fmt(max)}`;
   if (min) return `${fmt(min)}+`;
   return `Up to ${fmt(max!)}`;
@@ -116,6 +105,8 @@ export default function FindPage() {
   const [answers, setAnswers] = useState<Partial<WizardAnswers>>({});
   const [results, setResults] = useState<MatchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [captureEmail, setCaptureEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
 
   const totalSteps = 5;
 
@@ -137,6 +128,16 @@ export default function FindPage() {
     }
   }
 
+  async function saveResponse(email: string) {
+    if (!answers.stage) return;
+    await fetch("/api/wizard-response", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...answers, email: email || undefined }),
+    }).catch(() => {});
+    setEmailSent(true);
+  }
+
   function next(update: Partial<WizardAnswers>) {
     const merged = { ...answers, ...update };
     setAnswers(merged);
@@ -147,6 +148,9 @@ export default function FindPage() {
     }
   }
 
+  const selectedCountry = answers.country ?? "UK";
+  const cities = CITIES_BY_COUNTRY[selectedCountry] ?? [];
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
       <div className="mb-10 text-center">
@@ -156,7 +160,7 @@ export default function FindPage() {
         </div>
         <h1 className="text-3xl font-bold text-white sm:text-4xl">Find your perfect match</h1>
         <p className="mt-3 text-zinc-400">
-          Answer 5 quick questions and we&apos;ll rank the best-fit UK programmes for you.
+          Answer 5 quick questions and we&apos;ll rank the best-fit programmes across Europe for you.
         </p>
       </div>
 
@@ -167,11 +171,7 @@ export default function FindPage() {
           <h2 className="mb-6 text-xl font-semibold text-white">What stage are you at?</h2>
           <div className="flex flex-col gap-3">
             {STAGES.map((s) => (
-              <OptionCard
-                key={s.value}
-                selected={answers.stage === s.value}
-                onClick={() => next({ stage: s.value })}
-              >
+              <OptionCard key={s.value} selected={answers.stage === s.value} onClick={() => next({ stage: s.value })}>
                 <p className="font-medium">{s.label}</p>
                 <p className="mt-0.5 text-xs text-zinc-500">{s.desc}</p>
               </OptionCard>
@@ -194,18 +194,13 @@ export default function FindPage() {
                   key={s}
                   onClick={() => {
                     const cur = answers.sectors ?? [];
-                    const next = sel
-                      ? cur.filter((x) => x !== s)
-                      : cur.length < 3
-                      ? [...cur, s]
-                      : cur;
+                    const next = sel ? cur.filter((x) => x !== s) : cur.length < 3 ? [...cur, s] : cur;
                     setAnswers({ ...answers, sectors: next });
                   }}
                   className={cn(
                     "rounded-lg border px-3 py-1.5 text-sm transition-all",
-                    sel
-                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
-                      : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                    sel ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
                   )}
                 >
                   {s}
@@ -214,16 +209,10 @@ export default function FindPage() {
             })}
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={() => setStep(step - 1)}
-              className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white"
-            >
+            <button onClick={() => setStep(step - 1)} className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white">
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
-            <button
-              onClick={() => next({ sectors: answers.sectors ?? [] })}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-            >
+            <button onClick={() => next({ sectors: answers.sectors ?? [] })} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">
               Continue <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -237,47 +226,78 @@ export default function FindPage() {
           <h2 className="mb-6 text-xl font-semibold text-white">What matters most to you?</h2>
           <div className="flex flex-col gap-3">
             {PRIORITIES.map((p) => (
-              <OptionCard
-                key={p.value}
-                selected={answers.priority === p.value}
-                onClick={() => next({ priority: p.value })}
-              >
+              <OptionCard key={p.value} selected={answers.priority === p.value} onClick={() => next({ priority: p.value })}>
                 <p className="font-medium">{p.label}</p>
                 <p className="mt-0.5 text-xs text-zinc-500">{p.desc}</p>
               </OptionCard>
             ))}
           </div>
-          <button
-            onClick={() => setStep(step - 1)}
-            className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300"
-          >
+          <button onClick={() => setStep(step - 1)} className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
         </div>
       )}
 
-      {/* Step 4: Location */}
+      {/* Step 4: Location — country first, then city */}
       {step === 4 && (
         <div>
           <StepHeader step={4} total={totalSteps} />
           <h2 className="mb-6 text-xl font-semibold text-white">Where are you based?</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {LOCATIONS.map((l) => (
-              <OptionCard
-                key={l.value}
-                selected={answers.location === l.value}
-                onClick={() => next({ location: l.value })}
+
+          {/* Country */}
+          <p className="mb-2 text-sm text-zinc-400">Country</p>
+          <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {(EUROPEAN_COUNTRIES as unknown as string[]).map((c) => (
+              <button
+                key={c}
+                onClick={() => setAnswers({ ...answers, country: c, city: "" })}
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-sm transition-all text-left",
+                  answers.country === c
+                    ? "border-indigo-500 bg-indigo-500/10 text-white"
+                    : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                )}
               >
-                <p className="font-medium">{l.label}</p>
-              </OptionCard>
+                {c}
+              </button>
             ))}
           </div>
-          <button
-            onClick={() => setStep(step - 1)}
-            className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back
-          </button>
+
+          {/* City (if country selected and has cities) */}
+          {selectedCountry && cities.length > 0 && (
+            <>
+              <p className="mb-2 text-sm text-zinc-400">City (optional)</p>
+              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {cities.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setAnswers({ ...answers, city: answers.city === c ? "" : c })}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-sm transition-all text-left",
+                      answers.city === c
+                        ? "border-indigo-500 bg-indigo-500/10 text-white"
+                        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                    )}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="flex gap-3">
+            <button onClick={() => setStep(step - 1)} className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <button
+              onClick={() => next({ country: answers.country ?? "UK", city: answers.city ?? "" })}
+              disabled={!answers.country}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+            >
+              Continue <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -285,26 +305,17 @@ export default function FindPage() {
       {step === 5 && (
         <div>
           <StepHeader step={5} total={totalSteps} />
-          <h2 className="mb-2 text-xl font-semibold text-white">Do you need SEIS eligibility?</h2>
-          <p className="mb-6 text-sm text-zinc-500">
-            SEIS gives investors 50% tax relief — making fundraising significantly easier.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-white">Do you need SEIS/EIS eligibility?</h2>
+          <p className="mb-6 text-sm text-zinc-500">UK-specific tax relief giving investors up to 50% back — makes fundraising significantly easier for UK companies.</p>
           <div className="flex flex-col gap-3">
             {SEIS_OPTIONS.map((o) => (
-              <OptionCard
-                key={o.value}
-                selected={answers.seisNeeded === o.value}
-                onClick={() => next({ seisNeeded: o.value })}
-              >
+              <OptionCard key={o.value} selected={answers.seisNeeded === o.value} onClick={() => next({ seisNeeded: o.value })}>
                 <p className="font-medium">{o.label}</p>
                 <p className="mt-0.5 text-xs text-zinc-500">{o.desc}</p>
               </OptionCard>
             ))}
           </div>
-          <button
-            onClick={() => setStep(step - 1)}
-            className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300"
-          >
+          <button onClick={() => setStep(step - 1)} className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
         </div>
@@ -324,18 +335,44 @@ export default function FindPage() {
           <div className="mb-8 text-center">
             <CheckCircle className="mx-auto mb-3 h-10 w-10 text-green-500" />
             <h2 className="text-2xl font-bold text-white">Your top matches</h2>
-            <p className="mt-2 text-sm text-zinc-400">
-              Ranked by fit. Click any to view full details.
-            </p>
+            <p className="mt-2 text-sm text-zinc-400">Ranked by fit. Click any to view full details.</p>
           </div>
+
+          {/* Email capture */}
+          {!emailSent && (
+            <div className="mb-6 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4">
+              <p className="mb-3 text-sm font-medium text-zinc-300">
+                <Mail className="mr-1.5 inline h-4 w-4 text-indigo-400" />
+                Get these results + new matches emailed to you
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={captureEmail}
+                  onChange={(e) => setCaptureEmail(e.target.value)}
+                  className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none"
+                />
+                <button
+                  onClick={() => saveResponse(captureEmail)}
+                  disabled={!captureEmail.includes("@")}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-40"
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          )}
+          {emailSent && (
+            <div className="mb-6 rounded-xl border border-green-500/20 bg-green-500/5 p-4 text-sm text-green-400">
+              <CheckCircle className="mr-1.5 inline h-4 w-4" /> Saved — we&apos;ll email you new matches.
+            </div>
+          )}
 
           {results.length === 0 ? (
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center">
               <p className="text-zinc-400">No matches found. Try the full directory.</p>
-              <Link
-                href="/directory"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300"
-              >
+              <Link href="/directory" className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300">
                 Browse all programmes <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -351,31 +388,22 @@ export default function FindPage() {
                     <div className="flex-1 min-w-0">
                       <div className="mb-1 flex items-center gap-2 flex-wrap">
                         {i === 0 && (
-                          <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs font-medium text-indigo-400">
-                            Best match
-                          </span>
+                          <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs font-medium text-indigo-400">Best match</span>
                         )}
                         <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
                           {TYPE_LABELS[r.type] ?? r.type}
                         </span>
                       </div>
-                      <h3 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">
-                        {r.name}
-                      </h3>
-                      {r.location && (
-                        <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
-                          <MapPin className="h-3 w-3" />
-                          {r.location}
-                        </p>
-                      )}
+                      <h3 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">{r.name}</h3>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
+                        <MapPin className="h-3 w-3" />
+                        {r.location}{r.country && r.country !== "UK" && `, ${r.country}`}
+                      </p>
                       <p className="mt-2 text-sm text-zinc-400 line-clamp-2">{r.description}</p>
                       {r.matchReasons.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
                           {r.matchReasons.map((reason) => (
-                            <span
-                              key={reason}
-                              className="rounded-full border border-green-500/20 bg-green-500/10 px-2 py-0.5 text-xs text-green-400"
-                            >
+                            <span key={reason} className="rounded-full border border-green-500/20 bg-green-500/10 px-2 py-0.5 text-xs text-green-400">
                               {reason}
                             </span>
                           ))}
@@ -391,7 +419,7 @@ export default function FindPage() {
                   </div>
                   {(r.investmentMin !== null || r.investmentMax !== null) && (
                     <p className="mt-3 border-t border-zinc-800 pt-3 text-xs text-zinc-500">
-                      Investment: <span className="text-zinc-300">{formatInv(r.investmentMin, r.investmentMax)}</span>
+                      Investment: <span className="text-zinc-300">{formatInv(r.investmentMin, r.investmentMax, r.currency)}</span>
                     </p>
                   )}
                 </Link>
@@ -401,19 +429,12 @@ export default function FindPage() {
 
           <div className="mt-8 flex flex-col items-center gap-3">
             <button
-              onClick={() => {
-                setStep(1);
-                setAnswers({});
-                setResults([]);
-              }}
+              onClick={() => { setStep(1); setAnswers({}); setResults([]); setEmailSent(false); setCaptureEmail(""); }}
               className="text-sm text-zinc-500 hover:text-zinc-300"
             >
               Start over
             </button>
-            <Link
-              href="/directory"
-              className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300"
-            >
+            <Link href="/directory" className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300">
               Browse full directory <ExternalLink className="h-3.5 w-3.5" />
             </Link>
           </div>

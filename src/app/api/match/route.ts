@@ -5,7 +5,8 @@ interface MatchRequest {
   stage: string;
   sectors: string[];
   priority: string;
-  location: string;
+  country: string;
+  city: string;
   seisNeeded: string;
 }
 
@@ -15,8 +16,8 @@ function scoreAndExplain(
     sectors: string[];
     type: string;
     location: string;
+    country: string;
     seisEligible: boolean;
-    eisEligible: boolean;
     investmentMin: number | null;
     investmentMax: number | null;
     equityTaken: number | null;
@@ -27,11 +28,7 @@ function scoreAndExplain(
   const reasons: string[] = [];
 
   // Stage match (+30)
-  if (
-    p.stages.length === 0 ||
-    p.stages.includes(answers.stage) ||
-    p.stages.includes("ANY")
-  ) {
+  if (p.stages.length === 0 || p.stages.includes(answers.stage) || p.stages.includes("ANY")) {
     score += 30;
     reasons.push("Matches your stage");
   }
@@ -40,8 +37,7 @@ function scoreAndExplain(
   if (answers.sectors.length > 0) {
     const overlap = answers.sectors.filter((s) => p.sectors.includes(s));
     if (overlap.length > 0) {
-      const pts = Math.min(overlap.length * 20, 40);
-      score += pts;
+      score += Math.min(overlap.length * 20, 40);
       reasons.push(`Works with ${overlap.slice(0, 2).join(", ")}`);
     }
   } else {
@@ -51,9 +47,8 @@ function scoreAndExplain(
   // Priority match (+15)
   if (answers.priority === "funding" && p.investmentMin && p.investmentMin >= 50000) {
     score += 15;
-    reasons.push(`Strong funding: £${(p.investmentMin / 1000).toFixed(0)}k+`);
+    reasons.push(`Strong funding: ${p.investmentMin >= 1000000 ? `${p.investmentMin / 1000000}m` : `${p.investmentMin / 1000}k`}+`);
   } else if (answers.priority === "mentorship") {
-    // Proxy: programmes with reviews that rate mentorship highly
     score += 8;
   } else if (answers.priority === "network" && p.investmentMax && p.investmentMax >= 100000) {
     score += 15;
@@ -63,21 +58,16 @@ function scoreAndExplain(
     reasons.push("Equity-free programme");
   }
 
-  // Location match (+15)
-  if (answers.location === "uk_wide") {
-    score += 15;
-  } else if (answers.location && p.location) {
-    const locLower = p.location.toLowerCase();
-    if (
-      locLower.includes(answers.location.toLowerCase()) ||
-      locLower.includes("uk-wide") ||
-      locLower.includes("remote")
-    ) {
-      score += 15;
-      reasons.push(`Based in ${answers.location}`);
-    }
-  } else {
-    score += 5;
+  // Country match (+20)
+  if (answers.country && p.country === answers.country) {
+    score += 20;
+    reasons.push(`Based in ${answers.country}`);
+  }
+
+  // City match (+10)
+  if (answers.city && p.location.toLowerCase().includes(answers.city.toLowerCase())) {
+    score += 10;
+    reasons.push(`Located in ${answers.city}`);
   }
 
   // SEIS match (+10)
@@ -104,6 +94,8 @@ export async function POST(req: Request) {
         type: true,
         description: true,
         location: true,
+        country: true,
+        currency: true,
         stages: true,
         sectors: true,
         seisEligible: true,

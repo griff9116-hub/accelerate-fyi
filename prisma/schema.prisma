@@ -40,6 +40,8 @@ model Programme {
   updatedAt   DateTime @updatedAt
 
   submitterEmail String?
+  country        String  @default("UK")
+  currency       String  @default("GBP")
 
   reviews Review[]
   alerts  AlertMatch[]
@@ -88,6 +90,17 @@ model AlertMatch {
   programme Programme         @relation(fields: [programmeId], references: [id])
 
   @@unique([alertId, programmeId])
+}
+
+model WizardResponse {
+  id         String   @id @default(cuid())
+  email      String?
+  stage      String
+  sectors    String[]
+  priority   String
+  country    String
+  seisNeeded String
+  createdAt  DateTime @default(now())
 }
 
 enum ProgrammeType {

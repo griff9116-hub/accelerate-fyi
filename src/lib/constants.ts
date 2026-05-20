@@ -37,6 +37,80 @@ export const UK_LOCATIONS = [
   "UK-wide",
 ] as const;
 
+export const EUROPEAN_COUNTRIES = [
+  "UK",
+  "Germany",
+  "France",
+  "Netherlands",
+  "Sweden",
+  "Spain",
+  "Ireland",
+  "Denmark",
+  "Finland",
+  "Norway",
+  "Switzerland",
+  "Belgium",
+  "Portugal",
+  "Italy",
+  "Estonia",
+  "Poland",
+  "Czech Republic",
+  "Austria",
+] as const;
+
+export const CITIES_BY_COUNTRY: Record<string, string[]> = {
+  UK: ["London", "Manchester", "Bristol", "Birmingham", "Edinburgh", "Leeds", "Cambridge", "Oxford", "Liverpool", "Newcastle", "Sheffield", "Nottingham"],
+  Germany: ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne", "Stuttgart"],
+  France: ["Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux"],
+  Netherlands: ["Amsterdam", "Rotterdam", "The Hague", "Eindhoven"],
+  Sweden: ["Stockholm", "Gothenburg", "Malmö"],
+  Spain: ["Madrid", "Barcelona", "Valencia", "Bilbao"],
+  Ireland: ["Dublin", "Cork", "Galway"],
+  Denmark: ["Copenhagen"],
+  Finland: ["Helsinki", "Tampere", "Oulu"],
+  Norway: ["Oslo", "Bergen"],
+  Switzerland: ["Zurich", "Geneva", "Basel"],
+  Belgium: ["Brussels", "Antwerp", "Ghent"],
+  Portugal: ["Lisbon", "Porto"],
+  Italy: ["Milan", "Rome", "Turin", "Florence"],
+  Estonia: ["Tallinn", "Tartu"],
+  Poland: ["Warsaw", "Kraków", "Wrocław", "Poznań"],
+  "Czech Republic": ["Prague", "Brno"],
+  Austria: ["Vienna", "Graz"],
+};
+
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  GBP: "£",
+  EUR: "€",
+  USD: "$",
+  SEK: "SEK ",
+  NOK: "NOK ",
+  CHF: "CHF ",
+  DKK: "DKK ",
+  PLN: "PLN ",
+};
+
+export const COUNTRY_CURRENCY: Record<string, string> = {
+  UK: "GBP",
+  Germany: "EUR",
+  France: "EUR",
+  Netherlands: "EUR",
+  Sweden: "SEK",
+  Spain: "EUR",
+  Ireland: "EUR",
+  Denmark: "DKK",
+  Finland: "EUR",
+  Norway: "NOK",
+  Switzerland: "CHF",
+  Belgium: "EUR",
+  Portugal: "EUR",
+  Italy: "EUR",
+  Estonia: "EUR",
+  Poland: "PLN",
+  "Czech Republic": "EUR",
+  Austria: "EUR",
+};
+
 export const STAGE_LABELS: Record<string, string> = {
   PRE_IDEA: "Pre-idea",
   PRE_SEED: "Pre-seed",

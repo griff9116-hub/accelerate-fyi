@@ -3,18 +3,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { CheckCircle, Plus } from "lucide-react";
-import { SECTORS, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS } from "@/lib/constants";
+import { SECTORS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY, COUNTRY_CURRENCY } from "@/lib/constants";
 
 export default function SubmitPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "", websiteUrl: "", applyUrl: "", description: "",
-    type: "", location: "", isRemote: false,
+    type: "", country: "UK", location: "", isRemote: false,
     sectors: [] as string[], stages: [] as string[],
     seisEligible: false, eisEligible: false,
     equityTaken: "", investmentMin: "", investmentMax: "",
     cohortSize: "", durationWeeks: "", submitterEmail: "",
+    currency: "GBP",
   });
 
   function toggle<K extends "sectors" | "stages">(field: K, val: string) {
@@ -105,12 +106,30 @@ export default function SubmitPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs text-zinc-500">Location *</label>
-              <select required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={input}>
-                <option value="">Select location</option>
-                {UK_LOCATIONS.map((l) => <option key={l} value={l}>{l}</option>)}
+              <label className="mb-1.5 block text-xs text-zinc-500">Country *</label>
+              <select
+                required
+                value={form.country}
+                onChange={(e) => {
+                  const country = e.target.value;
+                  const currency = COUNTRY_CURRENCY[country] ?? "GBP";
+                  setForm({ ...form, country, currency, location: "" });
+                }}
+                className={input}
+              >
+                {EUROPEAN_COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+            <div>
+              <label className="mb-1.5 block text-xs text-zinc-500">City / Region *</label>
+              <select required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={input}>
+                <option value="">Select city</option>
+                {(CITIES_BY_COUNTRY[form.country] ?? []).map((l) => <option key={l} value={l}>{l}</option>)}
+                <option value={`${form.country}-wide`}>{form.country}-wide</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-end">
               <label className="flex cursor-pointer items-center gap-3">
                 <div onClick={() => setForm({ ...form, isRemote: !form.isRemote })} className={`relative h-5 w-9 rounded-full transition-colors ${form.isRemote ? "bg-indigo-600" : "bg-zinc-700"}`}>

@@ -138,7 +138,7 @@ export default async function ProgrammePage({ params }: PageProps) {
         {/* Key stats */}
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
-            { label: "Investment", value: formatInvestment(p.investmentMin, p.investmentMax), icon: TrendingUp },
+            { label: "Investment", value: formatInvestment(p.investmentMin, p.investmentMax, p.currency), icon: TrendingUp },
             { label: "Equity", value: formatEquity(p.equityTaken), icon: null },
             { label: "Cohort size", value: p.cohortSize ? `${p.cohortSize} companies` : "—", icon: Users },
             { label: "Duration", value: p.durationWeeks ? `${p.durationWeeks} weeks` : "—", icon: Clock },

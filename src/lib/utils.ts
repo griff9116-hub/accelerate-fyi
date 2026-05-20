@@ -5,10 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatInvestment(min?: number | null, max?: number | null): string {
+export function formatInvestment(min?: number | null, max?: number | null, currency = "GBP"): string {
   if (!min && !max) return "Undisclosed";
+  const symbols: Record<string, string> = { GBP: "£", EUR: "€", USD: "$" };
+  const sym = symbols[currency] ?? `${currency} `;
   const fmt = (n: number) =>
-    n >= 1_000_000 ? `£${n / 1_000_000}m` : n >= 1_000 ? `£${n / 1_000}k` : `£${n}`;
+    n >= 1_000_000 ? `${sym}${n / 1_000_000}m` : n >= 1_000 ? `${sym}${n / 1_000}k` : `${sym}${n}`;
   if (min && max) return `${fmt(min)} – ${fmt(max)}`;
   if (min) return `From ${fmt(min)}`;
   return `Up to ${fmt(max!)}`;

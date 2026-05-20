@@ -19,6 +19,7 @@ interface PageProps {
     type?: string;
     sector?: string;
     stage?: string;
+    country?: string;
     location?: string;
     seis?: string;
     eis?: string;
@@ -45,6 +46,7 @@ async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
   if (sp.type) where.type = sp.type;
   if (sp.sector) where.sectors = { has: sp.sector };
   if (sp.stage) where.stages = { has: sp.stage };
+  if (sp.country) where.country = sp.country;
   if (sp.location) where.location = { contains: sp.location, mode: "insensitive" };
   if (sp.seis === "1") where.seisEligible = true;
   if (sp.eis === "1") where.eisEligible = true;
@@ -82,7 +84,7 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const { programmes, total, page, pages } = await getProgrammes(sp);
 
-  const hasFilters = sp.q || sp.type || sp.sector || sp.stage || sp.location || sp.seis || sp.eis || sp.remote;
+  const hasFilters = sp.q || sp.type || sp.sector || sp.stage || sp.country || sp.location || sp.seis || sp.eis || sp.remote;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
