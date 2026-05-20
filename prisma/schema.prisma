@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Programme {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  name        String
+  websiteUrl  String
+  applyUrl    String?
+  description String
+  logoUrl     String?
+  type        ProgrammeType
+  location    String
+  isRemote    Boolean       @default(false)
+
+  sectors String[]
+  stages  Stage[]
+
+  seisEligible  Boolean @default(false)
+  eisEligible   Boolean @default(false)
+  equityTaken   Float?
+  investmentMin Int?
+  investmentMax Int?
+  cohortSize    Int?
+  durationWeeks Int?
+
+  applicationDeadline DateTime?
+  nextCohortDate      DateTime?
+
+  isFeatured  Boolean  @default(false)
+  isSponsored Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reviews Review[]
+  alerts  AlertMatch[]
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  programmeId String
+  programme   Programme @relation(fields: [programmeId], references: [id])
+
+  authorName    String
+  cohortYear    Int?
+  isVerified    Boolean @default(false)
+  isApproved    Boolean @default(false)
+  overallRating Int
+  equityRating  Int?
+  mentorRating  Int?
+  networkRating Int?
+  body          String
+
+  createdAt DateTime @default(now())
+}
+
+model AlertSubscription {
+  id        String          @id @default(cuid())
+  email     String          @unique
+  sectors   String[]
+  stages    Stage[]
+  location  String?
+  seisOnly  Boolean         @default(false)
+  types     ProgrammeType[]
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+
+  matches AlertMatch[]
+}
+
+model AlertMatch {
+  id          String    @id @default(cuid())
+  alertId     String
+  programmeId String
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  alert     AlertSubscription @relation(fields: [alertId], references: [id])
+  programme Programme         @relation(fields: [programmeId], references: [id])
+
+  @@unique([alertId, programmeId])
+}
+
+enum ProgrammeType {
+  ACCELERATOR
+  VENTURE_STUDIO
+  VC
+  ANGEL_NETWORK
+  INCUBATOR
+  GRANT
+}
+
+enum Stage {
+  PRE_IDEA
+  PRE_SEED
+  SEED
+  SERIES_A
+  SERIES_B_PLUS
+  ANY
+}
