@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
 import { FilterBar } from "@/components/programme/FilterBar";
+import { AdSlot } from "@/components/ui/AdSlot";
 import { SlidersHorizontal } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -117,6 +118,10 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
               </Suspense>
             </div>
           </div>
+
+          {/* Ad: leaderboard above results */}
+          <AdSlot slot="directory-top" format="horizontal" className="mb-4 hidden lg:block" />
+          <AdSlot slot="directory-top-mobile" format="auto" className="mb-4 lg:hidden" />
 
           {programmes.length === 0 ? (
             <div className="py-20 text-center">

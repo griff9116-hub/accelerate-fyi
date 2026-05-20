@@ -39,6 +39,8 @@ model Programme {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  submitterEmail String?
+
   reviews Review[]
   alerts  AlertMatch[]
 }

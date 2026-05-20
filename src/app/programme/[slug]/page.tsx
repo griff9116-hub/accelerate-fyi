@@ -4,12 +4,13 @@ import { prisma } from "@/lib/db";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { StarRating } from "@/components/ui/StarRating";
+import { AdSlot } from "@/components/ui/AdSlot";
 import { ReviewForm } from "@/components/programme/ReviewForm";
 import { TYPE_LABELS, STAGE_LABELS } from "@/lib/constants";
 import { formatInvestment, formatDeadline, formatEquity, avgRating } from "@/lib/utils";
 import {
   MapPin, Globe, ExternalLink, Clock, Users, TrendingUp,
-  Calendar, ArrowLeft, CheckCircle
+  Calendar, ArrowLeft, CheckCircle, Mail
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -39,6 +40,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+function buildJsonLd(p: NonNullable<Awaited<ReturnType<typeof getProgramme>>>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: p.name,
+    description: p.description,
+    url: p.websiteUrl,
+    ...(p.logoUrl ? { logo: p.logoUrl } : {}),
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "GB",
+      addressLocality: p.location ?? "United Kingdom",
+    },
+  };
+}
+
 export default async function ProgrammePage({ params }: PageProps) {
   const { slug } = await params;
   const p = await getProgramme(slug);
@@ -48,8 +65,14 @@ export default async function ProgrammePage({ params }: PageProps) {
   const reviews = p.reviews;
   const avg = avgRating(reviews.map((r) => r.overallRating));
 
+  const jsonLd = buildJsonLd(p);
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href="/directory"
         className="mb-6 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300"
@@ -168,6 +191,25 @@ export default async function ProgrammePage({ params }: PageProps) {
           ))}
         </div>
       </div>
+
+      {/* Ad slot */}
+      <AdSlot slot="programme-detail" format="rectangle" className="mt-6" />
+
+      {/* Sponsored CTA */}
+      {!p.isSponsored && (
+        <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 px-5 py-4">
+          <p className="text-sm text-zinc-500">
+            Are you affiliated with {p.name}?{" "}
+            <a
+              href="mailto:hello@accelerate.fyi"
+              className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Get featured on Accelerate.fyi
+            </a>
+          </p>
+        </div>
+      )}
 
       {/* Reviews */}
       <div className="mt-8">

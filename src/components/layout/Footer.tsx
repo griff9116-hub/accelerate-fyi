@@ -18,18 +18,27 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="flex gap-12 text-sm">
+          <div className="flex flex-wrap gap-12 text-sm">
             <div className="flex flex-col gap-2">
               <p className="font-medium text-zinc-300">Directory</p>
               <Link href="/directory" className="text-zinc-500 hover:text-zinc-300">All programmes</Link>
-              <Link href="/directory?type=ACCELERATOR" className="text-zinc-500 hover:text-zinc-300">Accelerators</Link>
-              <Link href="/directory?type=VENTURE_STUDIO" className="text-zinc-500 hover:text-zinc-300">Venture Studios</Link>
-              <Link href="/directory?type=VC" className="text-zinc-500 hover:text-zinc-300">VCs</Link>
+              <Link href="/accelerators" className="text-zinc-500 hover:text-zinc-300">Accelerators</Link>
+              <Link href="/venture-studios" className="text-zinc-500 hover:text-zinc-300">Venture Studios</Link>
+              <Link href="/vcs" className="text-zinc-500 hover:text-zinc-300">VCs</Link>
+              <Link href="/london" className="text-zinc-500 hover:text-zinc-300">London</Link>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="font-medium text-zinc-300">Account</p>
+              <p className="font-medium text-zinc-300">Tools</p>
+              <Link href="/find" className="text-zinc-500 hover:text-zinc-300">Find my match</Link>
               <Link href="/saved" className="text-zinc-500 hover:text-zinc-300">Saved</Link>
               <Link href="/alerts" className="text-zinc-500 hover:text-zinc-300">Deadline alerts</Link>
+              <Link href="/submit" className="text-zinc-500 hover:text-zinc-300">Submit a programme</Link>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-medium text-zinc-300">Company</p>
+              <Link href="/about" className="text-zinc-500 hover:text-zinc-300">About</Link>
+              <Link href="/blog" className="text-zinc-500 hover:text-zinc-300">Blog</Link>
+              <Link href="/advertise" className="text-zinc-500 hover:text-zinc-300">Advertise</Link>
             </div>
           </div>
         </div>
