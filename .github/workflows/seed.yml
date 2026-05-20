@@ -19,3 +19,6 @@ jobs:
       - run: npm run db:seed
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - run: npm run db:seed-full
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

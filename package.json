@@ -11,7 +11,10 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:seed-full": "tsx prisma/seed-full.ts",
+    "db:studio": "prisma studio",
+    "scrape": "tsx scripts/scrape.ts",
+    "db:import": "tsx scripts/import-scraped.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

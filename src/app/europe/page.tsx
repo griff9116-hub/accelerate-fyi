@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
+import { AdSlot } from "@/components/ui/AdSlot";
 import Link from "next/link";
 import { Globe } from "lucide-react";
 import type { Metadata } from "next";
@@ -45,6 +46,8 @@ export default async function EuropePage() {
           {programmes.length} programmes across Europe. From Berlin to Paris to Lisbon.
         </p>
       </div>
+
+      <AdSlot slot="category-europe" format="horizontal" className="mb-8" />
 
       {programmes.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-16 text-center">

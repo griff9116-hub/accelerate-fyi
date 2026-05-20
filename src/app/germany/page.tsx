@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
+import { AdSlot } from "@/components/ui/AdSlot";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { avgRating } from "@/lib/utils";
@@ -33,6 +34,8 @@ export default async function GermanyPage() {
         <h1 className="text-4xl font-bold text-white">German Startup Accelerators &amp; Investors</h1>
         <p className="mt-3 text-zinc-400">{programmes.length} programmes in Germany.</p>
       </div>
+
+      <AdSlot slot="category-germany" format="horizontal" className="mb-6" />
 
       {programmes.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-16 text-center">

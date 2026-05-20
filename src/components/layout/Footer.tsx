@@ -14,7 +14,7 @@ export function Footer() {
               <span>Accelerate<span className="text-indigo-400">.fyi</span></span>
             </Link>
             <p className="mt-2 max-w-xs text-sm text-zinc-500">
-              The UK&apos;s most comprehensive directory of accelerators, venture studios, and investors.
+              The most comprehensive directory of accelerators, venture studios, and investors across the UK and Europe.
             </p>
           </div>
 

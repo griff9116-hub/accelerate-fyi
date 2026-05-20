@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
+import { AdSlot } from "@/components/ui/AdSlot";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -38,6 +39,7 @@ export default async function AcceleratorsPage() {
           {mapped.length} accelerator programmes across the UK. Accelerators typically invest pre-seed or seed capital, take a small equity stake, and run structured cohort programmes with mentorship and a Demo Day.
         </p>
       </div>
+      <AdSlot slot="category-accelerators" format="horizontal" className="mb-6" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {mapped.map((p) => <ProgrammeCard key={p.slug} programme={p} />)}
       </div>

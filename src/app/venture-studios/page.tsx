@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
+import { AdSlot } from "@/components/ui/AdSlot";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -34,6 +35,7 @@ export default async function VentureStudiosPage() {
           {mapped.length} venture studios operating in the UK. Unlike accelerators, venture studios co-found companies — they typically take more equity but provide significant operational support, capital, and resources to build companies from scratch.
         </p>
       </div>
+      <AdSlot slot="category-venture-studios" format="horizontal" className="mb-6" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {mapped.map((p) => <ProgrammeCard key={p.slug} programme={p} />)}
       </div>

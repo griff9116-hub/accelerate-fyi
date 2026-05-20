@@ -64,7 +64,7 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-300">
               <Zap className="h-3.5 w-3.5" />
-              {stats.total} programmes tracked across the UK
+              {stats.total} programmes tracked across the UK & Europe
             </div>
             <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
               Find the right{" "}
@@ -74,7 +74,7 @@ export default async function HomePage() {
               for your startup
             </h1>
             <p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-400">
-              Stop joining whatever programme is in front of you. Search and filter every UK accelerator, venture studio, and investor by sector, stage, location, SEIS/EIS eligibility, and more.
+              Stop joining whatever programme is in front of you. Search and filter every accelerator, venture studio, and investor across the UK and Europe by sector, stage, location, SEIS/EIS eligibility, and more.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button href="/directory" size="lg">

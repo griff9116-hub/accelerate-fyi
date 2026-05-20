@@ -159,7 +159,7 @@ export default function AlertsPage() {
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 className="w-full rounded-lg border border-zinc-800 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-300 focus:border-indigo-500 focus:outline-none"
               >
-                <option value="">Any UK location</option>
+                <option value="">Any location</option>
                 {UK_LOCATIONS.map((l) => (
                   <option key={l} value={l}>{l}</option>
                 ))}

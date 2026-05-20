@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
+import { AdSlot } from "@/components/ui/AdSlot";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -34,6 +35,7 @@ export default async function LondonPage() {
           {mapped.length} programmes based in London — Europe&apos;s startup capital. From pre-idea cohort builders like EF and Antler to leading seed VCs and corporate accelerators.
         </p>
       </div>
+      <AdSlot slot="category-london" format="horizontal" className="mb-6" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {mapped.map((p) => <ProgrammeCard key={p.slug} programme={p} />)}
       </div>

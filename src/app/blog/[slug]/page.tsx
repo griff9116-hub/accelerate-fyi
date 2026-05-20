@@ -3,6 +3,7 @@ import { getAllPosts, getPost } from "@/lib/blog";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { AdSlot } from "@/components/ui/AdSlot";
 import type { Metadata } from "next";
 
 interface Props { params: Promise<{ slug: string }> }
@@ -40,13 +41,17 @@ export default async function BlogPostPage({ params }: Props) {
         <p className="mt-2 text-xs text-zinc-600">{new Date(post.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
       </header>
 
+      <AdSlot slot="blog-top" format="horizontal" className="mb-8" />
+
       <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-bold prose-h2:text-xl prose-h3:text-lg prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-zinc-200 prose-blockquote:border-indigo-500 prose-blockquote:text-zinc-400">
         <MDXRemote source={post.content} />
       </div>
 
-      <div className="mt-12 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6">
+      <AdSlot slot="blog-bottom" format="rectangle" className="mt-8" />
+
+      <div className="mt-8 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6">
         <h3 className="font-semibold text-white">Ready to find your programme?</h3>
-        <p className="mt-1 text-sm text-zinc-400">Browse the full UK directory or let our matching tool do the work.</p>
+        <p className="mt-1 text-sm text-zinc-400">Browse the full UK & European directory or let our matching tool do the work.</p>
         <div className="mt-4 flex gap-3">
           <Link href="/find" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Find my match</Link>
           <Link href="/directory" className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:border-zinc-600">Browse directory</Link>

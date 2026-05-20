@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Directory",
-  description: "Browse all UK accelerators, venture studios, VCs and more.",
+  description: "Browse accelerators, VCs, and venture studios across the UK and Europe.",
 };
 
 export const dynamic = "force-dynamic";
@@ -89,7 +89,7 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">UK Programme Directory</h1>
+        <h1 className="text-3xl font-bold text-white">UK & European Programme Directory</h1>
         <p className="mt-1 text-zinc-500">
           {total} programme{total !== 1 ? "s" : ""} found
           {hasFilters ? " matching your filters" : ""}

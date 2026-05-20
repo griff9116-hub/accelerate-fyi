@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "About Accelerate.fyi",
-  description: "Why we built the UK's most comprehensive directory of accelerators, venture studios, and investors — and how it helps founders pick the right programme.",
+  description: "Why we built the most comprehensive directory of accelerators, venture studios, and investors across the UK and Europe — and how it helps founders pick the right programme.",
 };
 
 export default function AboutPage() {
@@ -17,23 +17,23 @@ export default function AboutPage() {
         </div>
         <h1 className="text-4xl font-bold text-white">About Accelerate.fyi</h1>
         <p className="mt-4 text-lg text-zinc-400 max-w-xl mx-auto">
-          The UK&apos;s most comprehensive directory of accelerators, venture studios, and investors — built by founders, for founders.
+          The most comprehensive directory of accelerators, venture studios, and investors across the UK and Europe — built by founders, for founders.
         </p>
       </div>
 
       <div className="prose prose-invert max-w-none">
         <h2 className="text-2xl font-bold text-white">The problem we&apos;re solving</h2>
         <p className="text-zinc-400 leading-relaxed">
-          Too many UK founders join the first accelerator programme they come across — a local Natwest programme, a Growth Forge cohort, a corporate accelerator from their bank — without ever knowing what else is out there. These programmes are often generic, not matched to the founder&apos;s sector or stage, and may not be the best use of equity.
+          Too many founders join the first accelerator programme they come across — a local bank accelerator, a corporate cohort, a programme a friend mentioned — without ever knowing what else is out there. These programmes are often generic, not matched to the founder&apos;s sector or stage, and may not be the best use of equity.
         </p>
         <p className="text-zinc-400 leading-relaxed">
-          Meanwhile, the UK has some of the world&apos;s best accelerators, venture studios, and early-stage investors: Entrepreneur First, Seedcamp, Antler, Bethnal Green Ventures, Octopus Ventures, and dozens more. The problem isn&apos;t a lack of options — it&apos;s a lack of visibility.
+          Meanwhile, the UK and Europe have some of the world&apos;s best accelerators, venture studios, and early-stage investors: Entrepreneur First, Seedcamp, Station F, Antler, Speedinvest, Northzone, and hundreds more. The problem isn&apos;t a lack of options — it&apos;s a lack of visibility.
         </p>
 
         <h2 className="mt-10 text-2xl font-bold text-white">What Accelerate.fyi does</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {[
-            { icon: Search, title: "Comprehensive directory", desc: "Every UK accelerator, venture studio, VC, angel network, incubator, and grant programme in one place." },
+            { icon: Search, title: "Comprehensive directory", desc: "Every accelerator, venture studio, VC, angel network, incubator, and grant programme across the UK and Europe in one place." },
             { icon: Star, title: "Founder reviews", desc: "Real reviews from founders who went through each programme — before you hand over equity." },
             { icon: Bell, title: "Deadline alerts", desc: "Sign up once, tell us your sector and stage, get notified when matching programmes open applications." },
             { icon: Zap, title: "Find your match", desc: "Answer 5 questions about your startup and get a ranked shortlist of programmes most likely to be right for you." },
@@ -50,7 +50,7 @@ export default function AboutPage() {
 
         <h2 className="mt-10 text-2xl font-bold text-white">Who it&apos;s for</h2>
         <p className="text-zinc-400 leading-relaxed">
-          Accelerate.fyi is for any UK-based startup or scale-up founder who is evaluating whether to apply to an accelerator or seek investment — and wants to make that decision with full information rather than incomplete knowledge.
+          Accelerate.fyi is for any UK or European startup founder who is evaluating whether to apply to an accelerator or seek investment — and wants to make that decision with full information rather than incomplete knowledge.
         </p>
         <p className="text-zinc-400 leading-relaxed">
           It&apos;s also for accelerator programmes themselves: a free listing means your programme is discoverable by exactly the founders you want to attract.
