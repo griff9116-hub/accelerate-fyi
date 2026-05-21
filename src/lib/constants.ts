@@ -19,7 +19,19 @@ export const SECTORS = [
   "Web3 & Crypto",
   "Hardware & IoT",
   "Space Tech",
+  "Marinetech",
 ] as const;
+
+export const SECTOR_HIERARCHY: Record<string, string[]> = {
+  "AI & Machine Learning": ["Generative AI", "Computer Vision", "NLP", "ML Infrastructure"],
+  "Fintech": ["Payments", "Banking & Lending", "Insurtech", "RegTech", "Crypto & DeFi"],
+  "Healthtech": ["Digital Health", "Medtech", "Mental Health", "Biotech", "Health Data"],
+  "Cleantech": ["Climate Tech", "Energy Storage", "Carbon Markets", "Sustainable Agriculture", "Circular Economy"],
+  "Deep Tech": ["Robotics", "Quantum Computing", "Semiconductors", "Photonics"],
+  "SaaS / B2B Software": ["Developer Tools", "HR Tech", "Sales Tech", "Data & Analytics", "Security SaaS"],
+};
+
+export const ALL_SUBSECTORS: string[] = Object.values(SECTOR_HIERARCHY).flat();
 
 export const UK_LOCATIONS = [
   "London",

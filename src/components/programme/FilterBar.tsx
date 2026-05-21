@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
-import { Search, X } from "lucide-react";
-import { SECTORS, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
+import { useCallback, useState } from "react";
+import { Search, X, ChevronDown } from "lucide-react";
+import { SECTORS, SECTOR_HIERARCHY, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 
 const TYPES = Object.entries(TYPE_LABELS).filter(([val]) => val !== "VC");
 const STAGES = Object.entries(STAGE_LABELS);
@@ -29,7 +29,8 @@ export function FilterBar() {
 
   const q = params.get("q") ?? "";
   const type = params.get("type") ?? "";
-  const sector = params.get("sector") ?? "";
+  const rawSectors = params.get("sectors") ?? "";
+  const activeSectors = rawSectors ? rawSectors.split(",").filter(Boolean) : [];
   const stage = params.get("stage") ?? "";
   const country = params.get("country") ?? "";
   const location = params.get("location") ?? "";
@@ -37,7 +38,32 @@ export function FilterBar() {
   const eis = params.get("eis") === "1";
   const remote = params.get("remote") === "1";
 
-  const hasFilters = type || sector || stage || country || location || seis || eis || remote;
+  const hasFilters = type || activeSectors.length > 0 || stage || country || location || seis || eis || remote;
+
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  function toggleExpand(s: string) {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(s)) next.delete(s); else next.add(s);
+      return next;
+    });
+  }
+
+  function isExpanded(s: string) {
+    return activeSectors.includes(s) || expanded.has(s);
+  }
+
+  function toggleSector(s: string) {
+    const next = activeSectors.includes(s)
+      ? activeSectors.filter((x) => x !== s)
+      : [...activeSectors, s];
+    const nextParams = new URLSearchParams(params.toString());
+    if (next.length) nextParams.set("sectors", next.join(","));
+    else nextParams.delete("sectors");
+    nextParams.delete("page");
+    router.push(`${pathname}?${nextParams.toString()}`);
+  }
 
   const citiesForCountry = country && CITIES_BY_COUNTRY[country]
     ? CITIES_BY_COUNTRY[country]
@@ -106,17 +132,69 @@ export function FilterBar() {
 
       {/* Sector */}
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Sector</p>
-        <select
-          value={sector}
-          onChange={(e) => set("sector", e.target.value || null)}
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-300 focus:border-indigo-500 focus:outline-none"
-        >
-          <option value="">All sectors</option>
-          {SECTORS.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Sector</p>
+          {activeSectors.length > 0 && (
+            <span className="text-xs text-indigo-400">{activeSectors.length} selected</span>
+          )}
+        </div>
+        <div className="flex flex-col gap-0.5">
+          {(SECTORS as unknown as string[]).map((s) => {
+            const isActive = activeSectors.includes(s);
+            const hasSubs = !!SECTOR_HIERARCHY[s];
+            const subSectors = SECTOR_HIERARCHY[s] ?? [];
+            const activeSubCount = subSectors.filter((sub) => activeSectors.includes(sub)).length;
+            const showSubs = hasSubs && isExpanded(s);
+
+            return (
+              <div key={s}>
+                <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={() => toggleSector(s)}
+                    className={`flex-1 text-left rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      isActive
+                        ? "border-indigo-500 bg-indigo-600/20 text-indigo-400"
+                        : activeSubCount > 0
+                        ? "border-zinc-600 bg-zinc-800/60 text-zinc-300"
+                        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                    }`}
+                  >
+                    {s}
+                    {activeSubCount > 0 && !isActive && (
+                      <span className="ml-1 text-indigo-400">({activeSubCount})</span>
+                    )}
+                  </button>
+                  {hasSubs && (
+                    <button
+                      onClick={() => toggleExpand(s)}
+                      className="flex-shrink-0 rounded p-1 text-zinc-600 hover:text-zinc-400 transition-colors"
+                      aria-label={showSubs ? "Collapse" : "Expand"}
+                    >
+                      <ChevronDown className={`h-3 w-3 transition-transform ${showSubs ? "rotate-180" : ""}`} />
+                    </button>
+                  )}
+                </div>
+                {showSubs && (
+                  <div className="ml-2 mt-0.5 flex flex-col gap-0.5 border-l border-zinc-800 pl-2.5">
+                    {subSectors.map((sub) => (
+                      <button
+                        key={sub}
+                        onClick={() => toggleSector(sub)}
+                        className={`text-left rounded px-2 py-1 text-xs transition-colors ${
+                          activeSectors.includes(sub)
+                            ? "text-indigo-400 bg-indigo-600/10"
+                            : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Country */}
