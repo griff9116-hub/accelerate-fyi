@@ -1,0 +1,49 @@
+name: Scrape and import programmes
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (scrape only, do not import)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Scrape F6S
+        run: npm run scrape
+      - name: Upload scraped data as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraped-data
+          path: scripts/scraped-data.json
+          retention-days: 7
+      - name: Import into database
+        if: ${{ inputs.dry_run == 'false' }}
+        run: npm run db:import
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Summary
+        run: |
+          COUNT=$(node -e "const d=require('./scripts/scraped-data.json'); console.log(d.length)")
+          echo "Scraped $COUNT programmes from F6S"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry run — not imported. Download the artifact to review."
+          else
+            echo "Import complete. Check your directory."
+          fi
