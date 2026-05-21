@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { resend, buildAlertEmail } from "@/lib/email";
+import { getResend, buildAlertEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization");
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     if (!matches.length) continue;
 
     const html = buildAlertEmail(matches);
-    await resend.emails.send({
+    await getResend().emails.send({
       from: process.env.RESEND_FROM ?? "alerts@accelerate-fyi.vercel.app",
       to: sub.email,
       subject: `${matches.length} new programme${matches.length > 1 ? "s" : ""} matching your preferences`,
