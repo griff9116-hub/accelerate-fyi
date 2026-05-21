@@ -41,6 +41,7 @@ export function FilterBar() {
   const hasFilters = type || activeSectors.length > 0 || stage || country || location || seis || eis || remote;
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [showAllSectors, setShowAllSectors] = useState(false);
 
   function toggleExpand(s: string) {
     setExpanded((prev) => {
@@ -139,7 +140,7 @@ export function FilterBar() {
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          {(SECTORS as unknown as string[]).map((s) => {
+          {(SECTORS as unknown as string[]).filter((s, i) => showAllSectors || i < 8 || activeSectors.includes(s)).map((s) => {
             const isActive = activeSectors.includes(s);
             const hasSubs = !!SECTOR_HIERARCHY[s];
             const subSectors = SECTOR_HIERARCHY[s] ?? [];
@@ -194,6 +195,12 @@ export function FilterBar() {
               </div>
             );
           })}
+          <button
+            onClick={() => setShowAllSectors((v) => !v)}
+            className="mt-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          >
+            {showAllSectors ? "Show fewer" : `Show all ${(SECTORS as unknown as string[]).length} sectors`}
+          </button>
         </div>
       </div>
 

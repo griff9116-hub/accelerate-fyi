@@ -92,6 +92,20 @@ model AlertMatch {
   @@unique([alertId, programmeId])
 }
 
+model DeckReview {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  companyName String?
+  stage       String?
+  sectors     String[]
+  deckQuality Int?
+  teamScore   Int?
+  strengths   String[]
+  gaps        String[]
+  createdAt   DateTime @default(now())
+}
+
 model WizardResponse {
   id         String   @id @default(cuid())
   email      String?

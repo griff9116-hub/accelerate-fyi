@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, Bell, Menu, X, Sparkles, PlusCircle } from "lucide-react";
+import { Zap, Bell, Menu, X, Sparkles, PlusCircle, FileText } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +58,13 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Link
+            href="/review"
+            className="hidden items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors sm:flex"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Review my deck
+          </Link>
+          <Link
             href="/find"
             className="hidden items-center gap-1.5 rounded-lg border border-indigo-500/40 px-3 py-1.5 text-sm font-medium text-indigo-400 hover:border-indigo-500 hover:text-indigo-300 transition-colors sm:flex"
           >
@@ -100,6 +107,14 @@ export function Navbar() {
           >
             <PlusCircle className="h-4 w-4" />
             Submit a programme
+          </Link>
+          <Link
+            href="/review"
+            onClick={() => setOpen(false)}
+            className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2.5 text-sm font-medium text-zinc-300"
+          >
+            <FileText className="h-4 w-4" />
+            Review my deck
           </Link>
           <Link
             href="/find"
