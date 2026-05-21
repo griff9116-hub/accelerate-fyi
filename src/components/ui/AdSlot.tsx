@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -16,18 +16,26 @@ interface AdSlotProps {
 
 export function AdSlot({ slot, format = "auto", className }: AdSlotProps) {
   const pushed = useRef(false);
+  const [consented, setConsented] = useState(false);
 
   useEffect(() => {
-    if (pushed.current) return;
+    if (localStorage.getItem("cookie_consent") === "accepted") setConsented(true);
+    const handler = () => setConsented(true);
+    window.addEventListener("cookie_consent_accepted", handler);
+    return () => window.removeEventListener("cookie_consent_accepted", handler);
+  }, []);
+
+  useEffect(() => {
+    if (!consented || pushed.current) return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       pushed.current = true;
     } catch {
       // AdSense not loaded
     }
-  }, []);
+  }, [consented]);
 
-  if (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT) return null;
+  if (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT || !consented) return null;
 
   return (
     <div className={className}>

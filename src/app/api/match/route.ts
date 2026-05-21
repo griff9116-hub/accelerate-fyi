@@ -85,8 +85,12 @@ export async function POST(req: Request) {
   try {
     const body: MatchRequest = await req.json();
 
+    const countryFilter = body.country
+      ? { OR: [{ country: body.country }, { country: "Pan-European" }] }
+      : {};
+
     const programmes = await prisma.programme.findMany({
-      where: { isActive: true },
+      where: { isActive: true, ...countryFilter },
       select: {
         id: true,
         slug: true,
