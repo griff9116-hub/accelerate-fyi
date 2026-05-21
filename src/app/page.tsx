@@ -77,12 +77,15 @@ export default async function HomePage() {
               Stop joining whatever programme is in front of you. Search and filter every accelerator, venture studio, and investor across the UK and Europe by sector, stage, location, SEIS/EIS eligibility, and more.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button href="/directory" size="lg">
+              <Button href="/find" size="lg">
+                Find my match <Zap className="h-4 w-4" />
+              </Button>
+              <Button href="/directory" variant="secondary" size="lg">
                 Browse directory <ArrowRight className="h-4 w-4" />
               </Button>
               <Button href="/alerts" variant="secondary" size="lg">
                 <Bell className="h-4 w-4" />
-                Get deadline alerts
+                Get alerts
               </Button>
             </div>
           </div>
