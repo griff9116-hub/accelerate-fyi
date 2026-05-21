@@ -14,7 +14,7 @@
     "db:seed-full": "tsx prisma/seed-full.ts",
     "db:studio": "prisma studio",
     "scrape": "tsx scripts/scrape.ts",
-    "db:import": "tsx scripts/import-scraped.ts"
+    "db:import-csv": "tsx scripts/import-csv.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

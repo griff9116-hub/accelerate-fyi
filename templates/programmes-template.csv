@@ -1,0 +1,9 @@
+INSTRUCTIONS,Fill in one programme per row below. Delete this instructions row before sending back. Required fields marked *. For multiple sectors/stages separate with a pipe | character.,,,,,,,,,,,,,,,,,,,
+Name *,Type *,Country *,City *,Description *,Website URL *,Apply URL,Sectors (pipe-separated),Stages (pipe-separated),Investment Min (number only),Investment Max (number only),Currency (GBP or EUR),Equity %,SEIS Eligible (yes/no),EIS Eligible (yes/no),Remote/Hybrid (yes/no),Cohort Size,Duration (weeks),Application Deadline (DD/MM/YYYY),Next Cohort Date (DD/MM/YYYY),Featured (yes/no)
+Entrepreneur First,Accelerator,UK,London,"EF is the world's leading talent investor. They invest in exceptional individuals before they have a co-founder or idea.",https://joinef.com,https://joinef.com/apply,AI & Machine Learning|Deep Tech|SaaS / B2B Software,Pre-idea,80000,80000,GBP,10,no,no,no,80,12,,,yes
+Station F,Incubator,France,Paris,"Station F is the world's biggest startup campus. Home to 1000+ startups and 30+ programmes.",https://stationf.co,,AI & Machine Learning|SaaS / B2B Software|Fintech,Pre-seed|Seed,,,EUR,0,no,no,no,,,,,no
+,,,,,,,,,,,,,,,,,,,
+TYPE OPTIONS,Accelerator | Venture Studio | Incubator | Grant | Angel Network,,,,,,,,,,,,,,,,,,,
+STAGE OPTIONS,Pre-idea | Pre-seed | Seed | Series A,,,,,,,,,,,,,,,,,,,
+SECTOR OPTIONS,"AI & Machine Learning | Fintech | Healthtech | Edtech | Cleantech | Deep Tech | Consumer | SaaS / B2B Software | Marketplace | Govtech | Agritech | Proptech | Legaltech | Media & Creative | Social Impact | Future of Work | Cybersecurity | Web3 & Crypto | Hardware & IoT | Space Tech",,,,,,,,,,,,,,,,,,,
+COUNTRY OPTIONS,"UK | Germany | France | Netherlands | Sweden | Spain | Ireland | Estonia | Denmark | Finland | Norway | Switzerland | Belgium | Portugal | Italy | Austria | Poland | Czech Republic | Pan-European",,,,,,,,,,,,,,,,,,,

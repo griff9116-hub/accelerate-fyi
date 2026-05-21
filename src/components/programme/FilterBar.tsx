@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { Search, X } from "lucide-react";
 import { SECTORS, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 
-const TYPES = Object.entries(TYPE_LABELS);
+const TYPES = Object.entries(TYPE_LABELS).filter(([val]) => val !== "VC");
 const STAGES = Object.entries(STAGE_LABELS);
 
 export function FilterBar() {

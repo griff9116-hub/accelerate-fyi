@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function GermanyPage() {
   const rows = await prisma.programme.findMany({
-    where: { isActive: true, country: "Germany" },
+    where: { isActive: true, country: "Germany", NOT: { type: "VC" } },
     orderBy: [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
     include: { reviews: { where: { isApproved: true }, select: { overallRating: true } } },
   });

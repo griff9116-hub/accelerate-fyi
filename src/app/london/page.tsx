@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 export default async function LondonPage() {
   const programmes = await prisma.programme.findMany({
-    where: { isActive: true, location: { contains: "London", mode: "insensitive" } },
+    where: { isActive: true, location: { contains: "London", mode: "insensitive" }, NOT: { type: "VC" } },
     orderBy: [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
     include: { reviews: { where: { isApproved: true }, select: { overallRating: true } } },
   });

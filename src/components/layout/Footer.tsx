@@ -24,7 +24,6 @@ export function Footer() {
               <Link href="/directory" className="text-zinc-500 hover:text-zinc-300">All programmes</Link>
               <Link href="/accelerators" className="text-zinc-500 hover:text-zinc-300">Accelerators</Link>
               <Link href="/venture-studios" className="text-zinc-500 hover:text-zinc-300">Venture Studios</Link>
-              <Link href="/vcs" className="text-zinc-500 hover:text-zinc-300">VCs</Link>
               <Link href="/london" className="text-zinc-500 hover:text-zinc-300">London</Link>
               <Link href="/europe" className="text-zinc-500 hover:text-zinc-300">Europe</Link>
               <Link href="/germany" className="text-zinc-500 hover:text-zinc-300">Germany</Link>

@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
 
 async function getStats() {
   const [total, types] = await Promise.all([
-    prisma.programme.count({ where: { isActive: true } }),
-    prisma.programme.groupBy({ by: ["type"], _count: { _all: true } }),
+    prisma.programme.count({ where: { isActive: true, NOT: { type: "VC" } } }),
+    prisma.programme.groupBy({ by: ["type"], where: { isActive: true, NOT: { type: "VC" } }, _count: { _all: true } }),
   ]);
   return {
     total,
@@ -22,7 +22,7 @@ async function getStats() {
 
 async function getFeatured() {
   const rows = await prisma.programme.findMany({
-    where: { isActive: true, isFeatured: true },
+    where: { isActive: true, isFeatured: true, NOT: { type: "VC" } },
     take: 6,
     orderBy: { isSponsored: "desc" },
   });
@@ -39,6 +39,7 @@ async function getUpcoming() {
   return prisma.programme.findMany({
     where: {
       isActive: true,
+      NOT: { type: "VC" },
       applicationDeadline: { gte: new Date() },
     },
     orderBy: { applicationDeadline: "asc" },
@@ -99,8 +100,8 @@ export default async function HomePage() {
             {[
               { label: "Accelerators", value: stats.byType["ACCELERATOR"] ?? 0 },
               { label: "Venture Studios", value: stats.byType["VENTURE_STUDIO"] ?? 0 },
-              { label: "VCs", value: stats.byType["VC"] ?? 0 },
-              { label: "Other programmes", value: (stats.byType["ANGEL_NETWORK"] ?? 0) + (stats.byType["INCUBATOR"] ?? 0) + (stats.byType["GRANT"] ?? 0) },
+              { label: "Incubators", value: stats.byType["INCUBATOR"] ?? 0 },
+              { label: "Grants & Other", value: (stats.byType["ANGEL_NETWORK"] ?? 0) + (stats.byType["GRANT"] ?? 0) },
             ].map(({ label, value }) => (
               <div key={label} className="px-6 py-5 text-center">
                 <p className="text-2xl font-bold text-white">{value}</p>
@@ -206,7 +207,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h2 className="mb-8 text-2xl font-bold text-white">Browse by type</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(TYPE_LABELS).map(([type, label]) => (
+            {Object.entries(TYPE_LABELS).filter(([type]) => type !== "VC").map(([type, label]) => (
               <Link
                 key={type}
                 href={`/directory?type=${type}`}

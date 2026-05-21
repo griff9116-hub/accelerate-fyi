@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Directory",
-  description: "Browse accelerators, VCs, and venture studios across the UK and Europe.",
+  description: "Browse accelerators, venture studios, incubators, and grants across the UK and Europe.",
 };
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
   const page = parseInt(sp.page ?? "1", 10);
   const skip = (page - 1) * PAGE_SIZE;
 
-  const where: Record<string, unknown> = { isActive: true };
+  const where: Record<string, unknown> = { isActive: true, NOT: { type: "VC" } };
 
   if (sp.q) {
     where.OR = [
