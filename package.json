@@ -17,6 +17,7 @@
     "db:import-csv": "tsx scripts/import-csv.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.98.0",
     "@neondatabase/serverless": "^1.1.0",
     "@next/mdx": "^16.2.6",
     "@prisma/client": "^5.22.0",
@@ -28,6 +29,7 @@
     "next": "16.2.6",
     "next-auth": "^5.0.0-beta.31",
     "next-mdx-remote": "^6.0.0",
+    "pdf-parse": "^2.4.5",
     "prisma": "^5.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -38,11 +40,13 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "exceljs": "^4.4.0",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
     "typescript": "^5"

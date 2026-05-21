@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/db";
 import { ProgrammeCard } from "@/components/programme/ProgrammeCard";
 import { FilterBar } from "@/components/programme/FilterBar";
+import { MobileFilterToggle } from "@/components/programme/MobileFilterToggle";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { SlidersHorizontal } from "lucide-react";
 import type { Metadata } from "next";
@@ -86,6 +87,7 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   const { programmes, total, page, pages } = await getProgrammes(sp);
 
   const hasFilters = sp.q || sp.type || sp.sectors || sp.stage || sp.country || sp.location || sp.seis || sp.eis || sp.remote;
+  const activeFilterCount = [sp.type, sp.sectors, sp.stage, sp.country, sp.location, sp.seis, sp.eis, sp.remote].filter(Boolean).length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -100,7 +102,7 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
       <div className="flex gap-8">
         {/* Sidebar */}
         <aside className="hidden w-64 flex-shrink-0 lg:block">
-          <div className="sticky top-20 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+          <div className="sticky top-20 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-zinc-300">
               <SlidersHorizontal className="h-4 w-4" />
               Filters
@@ -113,14 +115,8 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
 
         {/* Grid */}
         <div className="flex-1">
-          {/* Mobile filter strip */}
-          <div className="mb-4 lg:hidden">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-              <Suspense>
-                <FilterBar />
-              </Suspense>
-            </div>
-          </div>
+          {/* Mobile filter toggle */}
+          <MobileFilterToggle activeFilterCount={activeFilterCount} />
 
           {/* Ad: leaderboard above results */}
           <AdSlot slot="directory-top" format="horizontal" className="mb-4 hidden lg:block" />
