@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle, MapPin, ExternalLink, Mail } from "lucide-react";
-import { SECTORS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
+import { SECTORS, SECTOR_HIERARCHY, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const STAGES = [
@@ -185,26 +185,73 @@ export default function FindPage() {
         <div>
           <StepHeader step={2} total={totalSteps} />
           <h2 className="mb-2 text-xl font-semibold text-white">What sector are you in?</h2>
-          <p className="mb-6 text-sm text-zinc-500">Select up to 3. Skip if sector-agnostic.</p>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {SECTORS.map((s) => {
+          <p className="mb-6 text-sm text-zinc-500">Select up to 5. Skip if sector-agnostic.</p>
+          <div className="mb-6 flex flex-col gap-2">
+            {(SECTORS as unknown as string[]).map((s) => {
               const sel = (answers.sectors ?? []).includes(s);
+              const hasSubs = !!SECTOR_HIERARCHY[s];
+              const subSectors = SECTOR_HIERARCHY[s] ?? [];
+              const activeSubCount = subSectors.filter((sub) => (answers.sectors ?? []).includes(sub)).length;
+              const limit = 5;
+              const atLimit = (answers.sectors ?? []).length >= limit;
+
               return (
-                <button
-                  key={s}
-                  onClick={() => {
-                    const cur = answers.sectors ?? [];
-                    const next = sel ? cur.filter((x) => x !== s) : cur.length < 3 ? [...cur, s] : cur;
-                    setAnswers({ ...answers, sectors: next });
-                  }}
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 text-sm transition-all",
-                    sel ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                <div key={s}>
+                  <button
+                    onClick={() => {
+                      const cur = answers.sectors ?? [];
+                      const next = sel ? cur.filter((x) => x !== s) : atLimit ? cur : [...cur, s];
+                      setAnswers({ ...answers, sectors: next });
+                    }}
+                    className={cn(
+                      "w-full text-left rounded-lg border px-3 py-2 text-sm transition-all",
+                      sel
+                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                        : activeSubCount > 0
+                        ? "border-zinc-600 bg-zinc-800/60 text-zinc-300"
                         : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                    )}
+                  >
+                    <span className="flex items-center justify-between">
+                      <span>{s}</span>
+                      {hasSubs && (
+                        <span className="text-xs text-zinc-600">
+                          {activeSubCount > 0 ? (
+                            <span className="text-indigo-400">{activeSubCount} sub-sector{activeSubCount > 1 ? "s" : ""}</span>
+                          ) : (
+                            "▾ sub-sectors"
+                          )}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                  {/* Sub-sectors appear when parent is selected */}
+                  {hasSubs && sel && (
+                    <div className="ml-3 mt-1 flex flex-wrap gap-1.5 border-l border-zinc-800 pl-3">
+                      {subSectors.map((sub) => {
+                        const subSel = (answers.sectors ?? []).includes(sub);
+                        return (
+                          <button
+                            key={sub}
+                            onClick={() => {
+                              const cur = answers.sectors ?? [];
+                              const next = subSel ? cur.filter((x) => x !== sub) : atLimit && !subSel ? cur : [...cur, sub];
+                              setAnswers({ ...answers, sectors: next });
+                            }}
+                            className={cn(
+                              "rounded-md border px-2.5 py-1 text-xs transition-all",
+                              subSel
+                                ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                                : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+                            )}
+                          >
+                            {sub}
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                >
-                  {s}
-                </button>
+                </div>
               );
             })}
           </div>
