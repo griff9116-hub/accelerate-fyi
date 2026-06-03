@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "scrape": "tsx scripts/scrape.ts",
     "db:import-csv": "tsx scripts/import-csv.ts",
-    "db:import-beauhurst": "tsx scripts/import-beauhurst.ts"
+    "db:import-beauhurst": "tsx scripts/import-beauhurst.ts",
+    "db:enrich": "tsx scripts/enrich-programmes.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",

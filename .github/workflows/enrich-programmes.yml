@@ -1,0 +1,39 @@
+name: Enrich Programme Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max programmes to process (leave blank for all)'
+        required: false
+        default: ''
+      slug:
+        description: 'Enrich a single programme by slug'
+        required: false
+        default: ''
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/accelerator-directory-platform-2ll6H
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Run enrichment
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            ARGS="$ARGS --limit ${{ github.event.inputs.limit }}"
+          fi
+          if [ -n "${{ github.event.inputs.slug }}" ]; then
+            ARGS="$ARGS --slug ${{ github.event.inputs.slug }}"
+          fi
+          npm run db:enrich -- $ARGS
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
