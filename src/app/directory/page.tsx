@@ -99,12 +99,18 @@ async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
 
     let distanceMiles: number | null = null;
     if (sortByDistance) {
-      const coords = CITY_COORDINATES[p.location];
+      // Try exact match, then fuzzy match (e.g. "London, UK" → "London")
+      let coords = CITY_COORDINATES[p.location];
+      if (!coords) {
+        const cityKey = Object.keys(CITY_COORDINATES).find((city) =>
+          p.location.toLowerCase().startsWith(city.toLowerCase())
+        );
+        if (cityKey) coords = CITY_COORDINATES[cityKey];
+      }
       if (coords) {
         distanceMiles = haversineDistance(userLat!, userLng!, coords[0], coords[1]);
-      } else if (p.location === "UK-wide") {
-        distanceMiles = 0; // treat UK-wide as local
       }
+      // UK-wide stays null — shows after location-specific results in distance sort
     }
 
     return {
