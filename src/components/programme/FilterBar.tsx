@@ -2,11 +2,11 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { Search, X, ChevronDown } from "lucide-react";
+import { Search, X, ChevronDown, MapPin, Loader2 } from "lucide-react";
 import { SECTORS, SECTOR_HIERARCHY, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 
 const TYPES = Object.entries(TYPE_LABELS).filter(([val]) => val !== "VC");
-const STAGES = Object.entries(STAGE_LABELS);
+const STAGES = Object.entries(STAGE_LABELS).filter(([val]) => val !== "ANY");
 
 export function FilterBar() {
   const router = useRouter();
@@ -38,10 +38,45 @@ export function FilterBar() {
   const eis = params.get("eis") === "1";
   const remote = params.get("remote") === "1";
 
-  const hasFilters = type || activeSectors.length > 0 || stage || country || location || seis || eis || remote;
+  const postcode = params.get("postcode") ?? "";
+
+  const hasFilters = type || activeSectors.length > 0 || stage || country || location || seis || eis || remote || postcode;
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [showAllSectors, setShowAllSectors] = useState(false);
+  const [postcodeInput, setPostcodeInput] = useState(postcode);
+  const [postcodeLoading, setPostcodeLoading] = useState(false);
+  const [postcodeError, setPostcodeError] = useState("");
+
+  async function resolvePostcode(value: string) {
+    const cleaned = value.replace(/\s+/g, "").toUpperCase();
+    if (!cleaned) {
+      const next = new URLSearchParams(params.toString());
+      next.delete("postcode"); next.delete("lat"); next.delete("lng"); next.delete("page");
+      router.push(`${pathname}?${next.toString()}`);
+      return;
+    }
+    setPostcodeLoading(true);
+    setPostcodeError("");
+    try {
+      const res = await fetch(`https://api.postcodes.io/postcodes/${cleaned}`);
+      const data = await res.json();
+      if (data.status === 200) {
+        const next = new URLSearchParams(params.toString());
+        next.set("postcode", cleaned);
+        next.set("lat", String(data.result.latitude));
+        next.set("lng", String(data.result.longitude));
+        next.delete("page");
+        router.push(`${pathname}?${next.toString()}`);
+      } else {
+        setPostcodeError("Invalid postcode");
+      }
+    } catch {
+      setPostcodeError("Could not look up postcode");
+    } finally {
+      setPostcodeLoading(false);
+    }
+  }
 
   function toggleExpand(s: string) {
     setExpanded((prev) => {
@@ -202,6 +237,38 @@ export function FilterBar() {
             {showAllSectors ? "Show fewer" : `Show all ${(SECTORS as unknown as string[]).length} sectors`}
           </button>
         </div>
+      </div>
+
+      {/* Postcode search */}
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Near postcode</p>
+        <div className="relative">
+          <MapPin className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
+          <input
+            type="text"
+            placeholder="e.g. EX1 1AY"
+            value={postcodeInput}
+            onChange={(e) => { setPostcodeInput(e.target.value); setPostcodeError(""); }}
+            onKeyDown={(e) => { if (e.key === "Enter") resolvePostcode(postcodeInput); }}
+            onBlur={() => resolvePostcode(postcodeInput)}
+            className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-2 pl-8 pr-8 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none"
+          />
+          {postcodeLoading && (
+            <Loader2 className="absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-zinc-500" />
+          )}
+          {postcode && !postcodeLoading && (
+            <button
+              onClick={() => { setPostcodeInput(""); resolvePostcode(""); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        {postcodeError && <p className="mt-1 text-xs text-red-400">{postcodeError}</p>}
+        {postcode && !postcodeError && (
+          <p className="mt-1 text-xs text-indigo-400">Showing nearest first</p>
+        )}
       </div>
 
       {/* Country */}
