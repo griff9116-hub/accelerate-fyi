@@ -3,36 +3,56 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle, MapPin, ExternalLink, Mail } from "lucide-react";
-import { SECTORS, SECTOR_HIERARCHY, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
+import { TYPE_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const STAGES = [
-  { value: "PRE_IDEA", label: "Pre-idea", desc: "Haven't started yet / looking for a co-founder" },
-  { value: "PRE_SEED", label: "Pre-seed", desc: "Have an idea or early prototype, no revenue" },
-  { value: "SEED", label: "Seed", desc: "Early revenue or strong traction, raising first round" },
-  { value: "SERIES_A", label: "Series A", desc: "Scaling, looking for growth capital" },
+  { value: "idea_preseed", label: "Idea / Pre-seed", desc: "Just an idea, no product or traction yet" },
+  { value: "seed", label: "Seed", desc: "Early product, some traction or pilot customers" },
+  { value: "growth", label: "Growth", desc: "Revenue-generating, scaling operations" },
+  { value: "series_a_plus", label: "Series A+", desc: "Established product, significant revenue, scaling rapidly" },
 ];
 
-const PRIORITIES = [
-  { value: "funding", label: "Funding amount", desc: "The size of the investment matters most" },
-  { value: "mentorship", label: "Mentorship quality", desc: "Access to experienced operators and advisors" },
-  { value: "network", label: "Investor network", desc: "Introductions to VCs and angels" },
-  { value: "equity_free", label: "Equity-free", desc: "I don't want to give up any equity" },
+const SECTORS = [
+  { value: "tech_software", label: "Tech / Software", desc: "SaaS, AI, developer tools, enterprise software" },
+  { value: "hardware_iot", label: "Hardware / IoT", desc: "Physical products, connected devices, robotics" },
+  { value: "biotech_healthtech", label: "Biotech / Healthtech", desc: "Life sciences, medical tech, digital health" },
+  { value: "climate_cleantech", label: "Climate / Cleantech", desc: "Sustainability, clean energy, carbon" },
+  { value: "fintech", label: "Fintech", desc: "Financial services, payments, insurtech" },
+  { value: "other", label: "Other / Not sure", desc: "Something else, or not sector-specific" },
 ];
 
-const SEIS_OPTIONS = [
-  { value: "yes", label: "Yes", desc: "SEIS eligibility is important for my fundraise" },
-  { value: "no", label: "No", desc: "I don't need SEIS" },
-  { value: "doesnt_matter", label: "Doesn't matter", desc: "No preference" },
+const CHALLENGES = [
+  { value: "product_development", label: "Product development", desc: "Building or improving the core product" },
+  { value: "customer_acquisition", label: "Customer acquisition", desc: "Getting more users and customers" },
+  { value: "funding", label: "Funding / Investment", desc: "Raising capital for growth" },
+  { value: "team_building", label: "Team building", desc: "Hiring key roles, expanding the team" },
+  { value: "market_validation", label: "Market validation", desc: "Proving the business model works" },
+  { value: "scaling", label: "Scaling operations", desc: "Expanding and operating at greater scale" },
+];
+
+const SUPPORT_TYPES = [
+  { value: "mentorship_networking", label: "Mentorship & networking", desc: "Experienced advisors and peer founder connections" },
+  { value: "funding_opps", label: "Funding opportunities", desc: "Direct investment or warm introductions to investors" },
+  { value: "industry_resources", label: "Industry-specific resources", desc: "Sector expertise, partnerships, and specialist tools" },
+  { value: "biz_dev_sales", label: "Business development & sales", desc: "GTM strategy and enterprise relationships" },
+  { value: "technical_expertise", label: "Technical expertise", desc: "Engineering, product, and R&D support" },
+];
+
+const OUTCOMES = [
+  { value: "fundraising", label: "Secure investment", desc: "Raise a round with support from the programme" },
+  { value: "product_tech", label: "Refine product-market fit", desc: "Sharpen your product and tech approach" },
+  { value: "sales_gtm", label: "Expand into new markets", desc: "Build sales pipelines and go-to-market strategy" },
+  { value: "hiring_people", label: "Build a stronger team", desc: "Hire and develop key people" },
+  { value: "pr_comms", label: "Gain credibility and visibility", desc: "PR, partnerships, and brand building" },
 ];
 
 interface WizardAnswers {
   stage: string;
-  sectors: string[];
-  priority: string;
-  country: string;
-  city: string;
-  seisNeeded: string;
+  sector: string;
+  challenge: string;
+  supportType: string;
+  outcome: string;
 }
 
 interface MatchResult {
@@ -148,9 +168,6 @@ export default function FindPage() {
     }
   }
 
-  const selectedCountry = answers.country ?? "UK";
-  const cities = CITIES_BY_COUNTRY[selectedCountry] ?? [];
-
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
       <div className="mb-10 text-center">
@@ -168,8 +185,8 @@ export default function FindPage() {
       {step === 1 && (
         <div>
           <StepHeader step={1} total={totalSteps} />
-          <h2 className="mb-6 text-xl font-semibold text-white">What stage are you at?</h2>
-          <div className="flex flex-col gap-3">
+          <h2 className="mb-2 text-xl font-semibold text-white">What stage is your startup currently in?</h2>
+          <div className="mt-6 flex flex-col gap-3">
             {STAGES.map((s) => (
               <OptionCard key={s.value} selected={answers.stage === s.value} onClick={() => next({ stage: s.value })}>
                 <p className="font-medium">{s.label}</p>
@@ -180,102 +197,16 @@ export default function FindPage() {
         </div>
       )}
 
-      {/* Step 2: Sectors */}
+      {/* Step 2: Sector */}
       {step === 2 && (
         <div>
           <StepHeader step={2} total={totalSteps} />
-          <h2 className="mb-2 text-xl font-semibold text-white">What sector are you in?</h2>
-          <p className="mb-6 text-sm text-zinc-500">Select up to 5. Skip if sector-agnostic.</p>
-          <div className="mb-6 flex flex-col gap-2">
-            {(SECTORS as unknown as string[]).map((s) => {
-              const sel = (answers.sectors ?? []).includes(s);
-              const hasSubs = !!SECTOR_HIERARCHY[s];
-              const subSectors = SECTOR_HIERARCHY[s] ?? [];
-              const activeSubCount = subSectors.filter((sub) => (answers.sectors ?? []).includes(sub)).length;
-              const limit = 5;
-              const atLimit = (answers.sectors ?? []).length >= limit;
-
-              return (
-                <div key={s}>
-                  <button
-                    onClick={() => {
-                      const cur = answers.sectors ?? [];
-                      const next = sel ? cur.filter((x) => x !== s) : atLimit ? cur : [...cur, s];
-                      setAnswers({ ...answers, sectors: next });
-                    }}
-                    className={cn(
-                      "w-full text-left rounded-lg border px-3 py-2 text-sm transition-all",
-                      sel
-                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
-                        : activeSubCount > 0
-                        ? "border-zinc-600 bg-zinc-800/60 text-zinc-300"
-                        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                    )}
-                  >
-                    <span className="flex items-center justify-between">
-                      <span>{s}</span>
-                      {hasSubs && (
-                        <span className="text-xs text-zinc-600">
-                          {activeSubCount > 0 ? (
-                            <span className="text-indigo-400">{activeSubCount} sub-sector{activeSubCount > 1 ? "s" : ""}</span>
-                          ) : (
-                            "▾ sub-sectors"
-                          )}
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                  {/* Sub-sectors appear when parent is selected */}
-                  {hasSubs && sel && (
-                    <div className="ml-3 mt-1 flex flex-wrap gap-1.5 border-l border-zinc-800 pl-3">
-                      {subSectors.map((sub) => {
-                        const subSel = (answers.sectors ?? []).includes(sub);
-                        return (
-                          <button
-                            key={sub}
-                            onClick={() => {
-                              const cur = answers.sectors ?? [];
-                              const next = subSel ? cur.filter((x) => x !== sub) : atLimit && !subSel ? cur : [...cur, sub];
-                              setAnswers({ ...answers, sectors: next });
-                            }}
-                            className={cn(
-                              "rounded-md border px-2.5 py-1 text-xs transition-all",
-                              subSel
-                                ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
-                                : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
-                            )}
-                          >
-                            {sub}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => setStep(step - 1)} className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </button>
-            <button onClick={() => next({ sectors: answers.sectors ?? [] })} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">
-              Continue <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Priority */}
-      {step === 3 && (
-        <div>
-          <StepHeader step={3} total={totalSteps} />
-          <h2 className="mb-6 text-xl font-semibold text-white">What matters most to you?</h2>
-          <div className="flex flex-col gap-3">
-            {PRIORITIES.map((p) => (
-              <OptionCard key={p.value} selected={answers.priority === p.value} onClick={() => next({ priority: p.value })}>
-                <p className="font-medium">{p.label}</p>
-                <p className="mt-0.5 text-xs text-zinc-500">{p.desc}</p>
+          <h2 className="mb-2 text-xl font-semibold text-white">What is your primary industry or sector?</h2>
+          <div className="mt-6 flex flex-col gap-3">
+            {SECTORS.map((s) => (
+              <OptionCard key={s.value} selected={answers.sector === s.value} onClick={() => next({ sector: s.value })}>
+                <p className="font-medium">{s.label}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">{s.desc}</p>
               </OptionCard>
             ))}
           </div>
@@ -285,78 +216,52 @@ export default function FindPage() {
         </div>
       )}
 
-      {/* Step 4: Location — country first, then city */}
-      {step === 4 && (
+      {/* Step 3: Challenge */}
+      {step === 3 && (
         <div>
-          <StepHeader step={4} total={totalSteps} />
-          <h2 className="mb-6 text-xl font-semibold text-white">Where are you based?</h2>
-
-          {/* Country */}
-          <p className="mb-2 text-sm text-zinc-400">Country</p>
-          <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {(EUROPEAN_COUNTRIES as unknown as string[]).map((c) => (
-              <button
-                key={c}
-                onClick={() => setAnswers({ ...answers, country: c, city: "" })}
-                className={cn(
-                  "rounded-lg border px-3 py-2 text-sm transition-all text-left",
-                  answers.country === c
-                    ? "border-indigo-500 bg-indigo-500/10 text-white"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                )}
-              >
-                {c}
-              </button>
+          <StepHeader step={3} total={totalSteps} />
+          <h2 className="mb-2 text-xl font-semibold text-white">What is your biggest current challenge?</h2>
+          <div className="mt-6 flex flex-col gap-3">
+            {CHALLENGES.map((c) => (
+              <OptionCard key={c.value} selected={answers.challenge === c.value} onClick={() => next({ challenge: c.value })}>
+                <p className="font-medium">{c.label}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">{c.desc}</p>
+              </OptionCard>
             ))}
           </div>
-
-          {/* City (if country selected and has cities) */}
-          {selectedCountry && cities.length > 0 && (
-            <>
-              <p className="mb-2 text-sm text-zinc-400">City (optional)</p>
-              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {cities.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setAnswers({ ...answers, city: answers.city === c ? "" : c })}
-                    className={cn(
-                      "rounded-lg border px-3 py-2 text-sm transition-all text-left",
-                      answers.city === c
-                        ? "border-indigo-500 bg-indigo-500/10 text-white"
-                        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                    )}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          <div className="flex gap-3">
-            <button onClick={() => setStep(step - 1)} className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </button>
-            <button
-              onClick={() => next({ country: answers.country ?? "UK", city: answers.city ?? "" })}
-              disabled={!answers.country}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-            >
-              Continue <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
+          <button onClick={() => setStep(step - 1)} className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
         </div>
       )}
 
-      {/* Step 5: SEIS */}
+      {/* Step 4: Support type */}
+      {step === 4 && (
+        <div>
+          <StepHeader step={4} total={totalSteps} />
+          <h2 className="mb-2 text-xl font-semibold text-white">What type of support do you need most?</h2>
+          <div className="mt-6 flex flex-col gap-3">
+            {SUPPORT_TYPES.map((s) => (
+              <OptionCard key={s.value} selected={answers.supportType === s.value} onClick={() => next({ supportType: s.value })}>
+                <p className="font-medium">{s.label}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">{s.desc}</p>
+              </OptionCard>
+            ))}
+          </div>
+          <button onClick={() => setStep(step - 1)} className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
+        </div>
+      )}
+
+      {/* Step 5: Outcome */}
       {step === 5 && (
         <div>
           <StepHeader step={5} total={totalSteps} />
-          <h2 className="mb-2 text-xl font-semibold text-white">Do you need SEIS/EIS eligibility?</h2>
-          <p className="mb-6 text-sm text-zinc-500">UK-specific tax relief giving investors up to 50% back — makes fundraising significantly easier for UK companies.</p>
-          <div className="flex flex-col gap-3">
-            {SEIS_OPTIONS.map((o) => (
-              <OptionCard key={o.value} selected={answers.seisNeeded === o.value} onClick={() => next({ seisNeeded: o.value })}>
+          <h2 className="mb-2 text-xl font-semibold text-white">What is your ideal outcome from joining an accelerator?</h2>
+          <div className="mt-6 flex flex-col gap-3">
+            {OUTCOMES.map((o) => (
+              <OptionCard key={o.value} selected={answers.outcome === o.value} onClick={() => next({ outcome: o.value })}>
                 <p className="font-medium">{o.label}</p>
                 <p className="mt-0.5 text-xs text-zinc-500">{o.desc}</p>
               </OptionCard>
