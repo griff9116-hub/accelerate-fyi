@@ -5,10 +5,15 @@ import { z } from "zod";
 const schema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   stage: z.string().min(1),
+  // New wizard fields
+  sector: z.string().optional(),
+  challenge: z.string().optional(),
+  supportType: z.string().optional(),
+  outcome: z.string().optional(),
+  // Legacy fields (kept for backward compat)
   sectors: z.array(z.string()).default([]),
-  priority: z.string().min(1),
+  priority: z.string().default(""),
   country: z.string().default("UK"),
-  city: z.string().default(""),
   seisNeeded: z.string().default("doesnt_matter"),
 });
 
@@ -20,10 +25,11 @@ export async function POST(req: NextRequest) {
       data: {
         email: body.email || null,
         stage: body.stage,
-        sectors: body.sectors,
-        priority: body.priority,
+        // Map new fields onto existing DB columns
+        sectors: body.sector ? [body.sector] : body.sectors,
+        priority: body.challenge ?? body.priority,
         country: body.country,
-        seisNeeded: body.seisNeeded,
+        seisNeeded: body.outcome ?? body.seisNeeded,
       },
     });
 
