@@ -1,0 +1,20 @@
+name: Import Beauhurst Accelerators
+
+on:
+  workflow_dispatch:
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/accelerator-directory-platform-2ll6H
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run db:import-beauhurst
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
