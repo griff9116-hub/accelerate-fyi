@@ -84,7 +84,7 @@ async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
     prisma.programme.count({ where }),
     prisma.programme.findMany({
       where,
-      orderBy: sortByDistance ? [{ isSponsored: "desc" }, { isFeatured: "desc" }] : [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
+      orderBy: sortByDistance ? [{ name: "asc" }] : [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
       skip: sortByDistance ? 0 : skip,
       take: sortByDistance ? undefined : PAGE_SIZE,
       include: { reviews: { where: { isApproved: true }, select: { overallRating: true } } },
@@ -126,12 +126,14 @@ async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
   if (sortByDistance) {
     programmes = programmes
       .sort((a, b) => {
-        // Sponsored/featured first, then by distance (null = far away)
-        if (a.isSponsored !== b.isSponsored) return a.isSponsored ? -1 : 1;
-        if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+        // When sorting by distance, distance is the primary key
         const da = a.distanceMiles ?? 9999;
         const db = b.distanceMiles ?? 9999;
-        return da - db;
+        if (da !== db) return da - db;
+        // Within the same distance band, sponsored/featured first
+        if (a.isSponsored !== b.isSponsored) return a.isSponsored ? -1 : 1;
+        if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+        return 0;
       })
       .slice(skip, skip + PAGE_SIZE);
   }
