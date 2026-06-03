@@ -5,6 +5,8 @@ import { FilterBar } from "@/components/programme/FilterBar";
 import { MobileFilterToggle } from "@/components/programme/MobileFilterToggle";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { SlidersHorizontal } from "lucide-react";
+import { CITY_COORDINATES } from "@/lib/constants";
+import { haversineDistance } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -26,6 +28,9 @@ interface PageProps {
     eis?: string;
     remote?: string;
     page?: string;
+    postcode?: string;
+    lat?: string;
+    lng?: string;
   }>;
 }
 
@@ -33,51 +38,97 @@ const PAGE_SIZE = 18;
 
 async function getProgrammes(sp: Awaited<PageProps["searchParams"]>) {
   const page = parseInt(sp.page ?? "1", 10);
-  const skip = (page - 1) * PAGE_SIZE;
+
+  const userLat = sp.lat ? parseFloat(sp.lat) : null;
+  const userLng = sp.lng ? parseFloat(sp.lng) : null;
+  const sortByDistance = userLat !== null && userLng !== null;
 
   const where: Record<string, unknown> = { isActive: true, NOT: { type: "VC" } };
+  const andConditions: Record<string, unknown>[] = [];
 
   if (sp.q) {
-    where.OR = [
-      { name: { contains: sp.q, mode: "insensitive" } },
-      { description: { contains: sp.q, mode: "insensitive" } },
-      { sectors: { has: sp.q } },
-    ];
+    andConditions.push({
+      OR: [
+        { name: { contains: sp.q, mode: "insensitive" } },
+        { description: { contains: sp.q, mode: "insensitive" } },
+        { sectors: { has: sp.q } },
+      ],
+    });
   }
+
   if (sp.type) where.type = sp.type;
   const selectedSectors = sp.sectors ? sp.sectors.split(",").filter(Boolean) : [];
   if (selectedSectors.length) where.sectors = { hasSome: selectedSectors };
   if (sp.stage) where.stages = { has: sp.stage };
   if (sp.country) where.country = sp.country;
-  if (sp.location) where.location = { contains: sp.location, mode: "insensitive" };
+
+  if (sp.location) {
+    // UK-wide programmes appear in every city search
+    andConditions.push({
+      OR: [
+        { location: { contains: sp.location, mode: "insensitive" } },
+        { location: "UK-wide" },
+      ],
+    });
+  }
+
   if (sp.seis === "1") where.seisEligible = true;
   if (sp.eis === "1") where.eisEligible = true;
   if (sp.remote === "1") where.isRemote = true;
+  if (andConditions.length) where.AND = andConditions;
 
+  const skip = (page - 1) * PAGE_SIZE;
+
+  // When sorting by distance we fetch all (no skip/take) then sort+paginate in JS
   const [total, rows] = await Promise.all([
     prisma.programme.count({ where }),
     prisma.programme.findMany({
       where,
-      orderBy: [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
-      skip,
-      take: PAGE_SIZE,
+      orderBy: sortByDistance ? [{ isSponsored: "desc" }, { isFeatured: "desc" }] : [{ isSponsored: "desc" }, { isFeatured: "desc" }, { name: "asc" }],
+      skip: sortByDistance ? 0 : skip,
+      take: sortByDistance ? undefined : PAGE_SIZE,
       include: { reviews: { where: { isApproved: true }, select: { overallRating: true } } },
     }),
   ]);
 
-  const programmes = rows.map((p) => {
+  let programmes = rows.map((p) => {
     const approved = p.reviews;
     const avgRating = approved.length
       ? Math.round((approved.reduce((a, r) => a + r.overallRating, 0) / approved.length) * 10) / 10
       : null;
+
+    let distanceMiles: number | null = null;
+    if (sortByDistance) {
+      const coords = CITY_COORDINATES[p.location];
+      if (coords) {
+        distanceMiles = haversineDistance(userLat!, userLng!, coords[0], coords[1]);
+      } else if (p.location === "UK-wide") {
+        distanceMiles = 0; // treat UK-wide as local
+      }
+    }
+
     return {
       ...p,
       applicationDeadline: p.applicationDeadline?.toISOString() ?? null,
       nextCohortDate: p.nextCohortDate?.toISOString() ?? null,
       avgRating,
       reviewCount: approved.length,
+      distanceMiles,
     };
   });
+
+  if (sortByDistance) {
+    programmes = programmes
+      .sort((a, b) => {
+        // Sponsored/featured first, then by distance (null = far away)
+        if (a.isSponsored !== b.isSponsored) return a.isSponsored ? -1 : 1;
+        if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+        const da = a.distanceMiles ?? 9999;
+        const db = b.distanceMiles ?? 9999;
+        return da - db;
+      })
+      .slice(skip, skip + PAGE_SIZE);
+  }
 
   return { programmes, total, page, pages: Math.ceil(total / PAGE_SIZE) };
 }
@@ -86,8 +137,8 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const { programmes, total, page, pages } = await getProgrammes(sp);
 
-  const hasFilters = sp.q || sp.type || sp.sectors || sp.stage || sp.country || sp.location || sp.seis || sp.eis || sp.remote;
-  const activeFilterCount = [sp.type, sp.sectors, sp.stage, sp.country, sp.location, sp.seis, sp.eis, sp.remote].filter(Boolean).length;
+  const hasFilters = sp.q || sp.type || sp.sectors || sp.stage || sp.country || sp.location || sp.seis || sp.eis || sp.remote || sp.postcode;
+  const activeFilterCount = [sp.type, sp.sectors, sp.stage, sp.country, sp.location, sp.seis, sp.eis, sp.remote, sp.postcode].filter(Boolean).length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

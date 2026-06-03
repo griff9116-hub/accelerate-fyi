@@ -33,6 +33,7 @@ export interface ProgrammeCardData {
   isSponsored: boolean;
   avgRating?: number | null;
   reviewCount?: number;
+  distanceMiles?: number | null;
 }
 
 interface ProgrammeCardProps {
@@ -81,6 +82,11 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
             <span className="flex items-center gap-0.5 text-xs text-zinc-500">
               <MapPin className="h-3 w-3" />
               {p.location}{p.country && p.country !== "UK" && `, ${p.country}`}{p.isRemote && " · Remote"}
+              {p.distanceMiles != null && (
+                <span className="ml-1 rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400">
+                  ~{Math.round(p.distanceMiles)} mi
+                </span>
+              )}
             </span>
           </div>
         </div>

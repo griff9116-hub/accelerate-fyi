@@ -64,10 +64,17 @@ function scoreAndExplain(
     reasons.push(`Based in ${answers.country}`);
   }
 
-  // City match (+10)
-  if (answers.city && p.location.toLowerCase().includes(answers.city.toLowerCase())) {
-    score += 10;
-    reasons.push(`Located in ${answers.city}`);
+  // City match (+10) — UK-wide programmes count for any city
+  if (answers.city) {
+    const isUKWide = p.location.toLowerCase() === "uk-wide";
+    const isCityMatch = p.location.toLowerCase().includes(answers.city.toLowerCase());
+    if (isCityMatch) {
+      score += 10;
+      reasons.push(`Located in ${answers.city}`);
+    } else if (isUKWide) {
+      score += 10;
+      reasons.push("Available UK-wide");
+    }
   }
 
   // SEIS match (+10)
@@ -90,7 +97,7 @@ export async function POST(req: Request) {
       : {};
 
     const programmes = await prisma.programme.findMany({
-      where: { isActive: true, ...countryFilter },
+      where: { isActive: true, NOT: { type: "VC" }, ...countryFilter },
       select: {
         id: true,
         slug: true,
