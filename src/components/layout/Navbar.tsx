@@ -58,11 +58,11 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/review"
+            href="/match-deck"
             className="hidden items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors sm:flex"
           >
             <FileText className="h-3.5 w-3.5" />
-            Review my deck
+            Match my deck
           </Link>
           <Link
             href="/find"
@@ -109,12 +109,12 @@ export function Navbar() {
             Submit a programme
           </Link>
           <Link
-            href="/review"
+            href="/match-deck"
             onClick={() => setOpen(false)}
             className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2.5 text-sm font-medium text-zinc-300"
           >
             <FileText className="h-4 w-4" />
-            Review my deck
+            Match my deck
           </Link>
           <Link
             href="/find"

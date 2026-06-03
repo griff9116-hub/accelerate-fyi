@@ -259,7 +259,7 @@ const programmes = [
     description:
       "NatWest Entrepreneur Accelerator is a free, equity-free programme with hubs across 12 UK cities including London, Manchester, and Edinburgh. Startups receive free workspace, dedicated coaches, mentorship, and access to NatWest's customer network.",
     type: "ACCELERATOR" as const,
-    location: "Multiple UK Cities",
+    location: "UK-wide",
     country: "UK",
     currency: "GBP",
     isRemote: true,
@@ -2420,7 +2420,7 @@ const programmes = [
     description:
       "Antler operates multiple European cohorts across London, Amsterdam, Berlin, Stockholm, and other cities. A global day-zero VC, they back exceptional founders before they have an idea or co-founder, investing at the earliest possible stage.",
     type: "ACCELERATOR" as const,
-    location: "Multiple Cities",
+    location: "UK-wide",
     country: "Pan-European",
     currency: "EUR",
     isRemote: false,
@@ -3339,7 +3339,7 @@ const programmes = [
     description:
       "Plug and Play is a global accelerator and VC operating across 50+ cities worldwide, including Berlin, Paris, Amsterdam, and London. They run equity-light accelerator programmes connecting startups with corporate partners for pilots and investment.",
     type: "ACCELERATOR" as const,
-    location: "Multiple Cities",
+    location: "UK-wide",
     country: "Pan-European",
     currency: "EUR",
     isRemote: false,
@@ -3523,7 +3523,7 @@ const programmes = [
     description:
       "IBM Hyper Protect Accelerator is an equity-free digital health and fintech programme run by IBM across Europe. Startups receive technical access to IBM Cloud services, mentorship from IBM experts, and co-creation opportunities with enterprise clients.",
     type: "ACCELERATOR" as const,
-    location: "Multiple Cities",
+    location: "UK-wide",
     country: "Pan-European",
     currency: "EUR",
     isRemote: true,
