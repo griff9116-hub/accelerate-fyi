@@ -152,7 +152,15 @@ export default async function ProgrammePage({ params }: PageProps) {
 
         {/* Deadline / cohort */}
         <div className="mt-4 flex flex-wrap gap-3">
-          {deadline.label !== "Rolling" && (
+          {deadline.label === "Rolling" ? (
+            <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-800/50 px-4 py-3">
+              <Calendar className="h-4 w-4 text-zinc-500" />
+              <div>
+                <p className="text-xs text-zinc-500">Application deadline</p>
+                <p className="font-semibold text-zinc-200">Rolling admissions — apply any time</p>
+              </div>
+            </div>
+          ) : deadline.label !== "Closed" && deadline.label !== "No deadline" && (
             <div className={`flex items-center gap-2 rounded-xl border px-4 py-3 ${deadline.urgent ? "border-amber-500/30 bg-amber-500/10" : "border-zinc-800 bg-zinc-800/50"}`}>
               <Calendar className={`h-4 w-4 ${deadline.urgent ? "text-amber-400" : "text-zinc-500"}`} />
               <div>

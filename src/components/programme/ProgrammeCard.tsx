@@ -40,9 +40,19 @@ interface ProgrammeCardProps {
   programme: ProgrammeCardData;
 }
 
+const LOGO_COLORS = [
+  "bg-indigo-700", "bg-violet-700", "bg-blue-700", "bg-emerald-700",
+  "bg-rose-700", "bg-amber-700", "bg-cyan-700", "bg-pink-700",
+];
+function logoColor(name: string): string {
+  return LOGO_COLORS[name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % LOGO_COLORS.length];
+}
+
 export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
   const { isSaved, toggle } = useSaved(p.id);
   const deadline = formatDeadline(p.applicationDeadline ? new Date(p.applicationDeadline) : null);
+
+  const hasStats = (p.investmentMin || p.investmentMax) || p.equityTaken != null || p.cohortSize || p.durationWeeks;
 
   return (
     <div
@@ -51,15 +61,25 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
         p.isSponsored ? "border-indigo-500/40" : "border-zinc-800"
       )}
     >
+      {/* Full-card click overlay */}
+      <Link
+        href={`/programme/${p.slug}`}
+        className="absolute inset-0 rounded-xl"
+        aria-label={`View ${p.name}`}
+      />
+
       {p.isSponsored && (
-        <div className="absolute right-3 top-3 rounded-full bg-indigo-600/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
+        <div className="relative z-10 pointer-events-none absolute right-3 top-3 rounded-full bg-indigo-600/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
           Sponsored
         </div>
       )}
 
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-lg font-bold text-zinc-300">
+        <div className={cn(
+          "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white",
+          p.logoUrl ? "bg-zinc-800" : logoColor(p.name)
+        )}>
           {p.logoUrl ? (
             <img src={p.logoUrl} alt={p.name} className="h-full w-full rounded-lg object-contain p-1" />
           ) : (
@@ -92,9 +112,9 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
         </div>
 
         <button
-          onClick={() => toggle()}
+          onClick={(e) => { e.preventDefault(); toggle(); }}
           aria-label={isSaved ? "Remove from saved" : "Save programme"}
-          className="flex-shrink-0 rounded-md p-1 text-zinc-600 transition-colors hover:text-indigo-400"
+          className="relative z-10 flex-shrink-0 rounded-md p-1 text-zinc-600 transition-colors hover:text-indigo-400"
         >
           {isSaved ? <BookmarkCheck className="h-4 w-4 text-indigo-400" /> : <Bookmark className="h-4 w-4" />}
         </button>
@@ -115,29 +135,35 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
         </div>
       )}
 
-      {/* Stats row */}
-      <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-zinc-800 pt-4 text-xs">
-        <div className="flex items-center gap-1.5 text-zinc-400">
-          <TrendingUp className="h-3.5 w-3.5 text-zinc-600" />
-          <span>{formatInvestment(p.investmentMin, p.investmentMax, p.currency ?? "GBP")}</span>
+      {/* Stats row — only rendered when there's actual data */}
+      {hasStats && (
+        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-zinc-800 pt-4 text-xs">
+          {(p.investmentMin || p.investmentMax) && (
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <TrendingUp className="h-3.5 w-3.5 text-zinc-600" />
+              <span>{formatInvestment(p.investmentMin, p.investmentMax, p.currency ?? "GBP")}</span>
+            </div>
+          )}
+          {p.equityTaken != null && (
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <span className="text-zinc-600">Equity:</span>
+              <span>{p.equityTaken === 0 ? "Equity-free" : formatEquity(p.equityTaken)}</span>
+            </div>
+          )}
+          {p.cohortSize && (
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <Users className="h-3.5 w-3.5 text-zinc-600" />
+              <span>{p.cohortSize} per cohort</span>
+            </div>
+          )}
+          {p.durationWeeks && (
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <Clock className="h-3.5 w-3.5 text-zinc-600" />
+              <span>{p.durationWeeks}w programme</span>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-1.5 text-zinc-400">
-          <span className="text-zinc-600">Equity:</span>
-          <span>{formatEquity(p.equityTaken)}</span>
-        </div>
-        {p.cohortSize && (
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <Users className="h-3.5 w-3.5 text-zinc-600" />
-            <span>{p.cohortSize} per cohort</span>
-          </div>
-        )}
-        {p.durationWeeks && (
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <Clock className="h-3.5 w-3.5 text-zinc-600" />
-            <span>{p.durationWeeks}w programme</span>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Badges row */}
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -151,7 +177,9 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
       {/* Footer */}
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {deadline.label !== "Rolling" && deadline.label !== "Closed" && (
+          {deadline.label === "Rolling" ? (
+            <Badge variant="default">Rolling admissions</Badge>
+          ) : deadline.label !== "Closed" && deadline.label !== "No deadline" && (
             <Badge variant={deadline.urgent ? "amber" : "default"}>
               {deadline.urgent && "⏱ "}{deadline.label}
             </Badge>
@@ -165,7 +193,7 @@ export function ProgrammeCard({ programme: p }: ProgrammeCardProps) {
         </div>
         <Link
           href={`/programme/${p.slug}`}
-          className="flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-indigo-600 hover:text-white"
+          className="relative z-10 flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-indigo-600 hover:text-white"
         >
           View <ExternalLink className="h-3 w-3" />
         </Link>

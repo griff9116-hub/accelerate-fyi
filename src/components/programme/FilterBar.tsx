@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { Search, X, ChevronDown, MapPin, Loader2 } from "lucide-react";
+import { Search, X, ChevronDown, MapPin, Loader2, ArrowRight } from "lucide-react";
 import { SECTORS, SECTOR_HIERARCHY, UK_LOCATIONS, STAGE_LABELS, TYPE_LABELS, EUROPEAN_COUNTRIES, CITIES_BY_COUNTRY } from "@/lib/constants";
 
 const TYPES = Object.entries(TYPE_LABELS).filter(([val]) => val !== "VC");
@@ -42,8 +42,8 @@ export function FilterBar() {
 
   const hasFilters = type || activeSectors.length > 0 || stage || country || location || seis || eis || remote || postcode;
 
+  const [searchInput, setSearchInput] = useState(q);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [showAllSectors, setShowAllSectors] = useState(false);
   const [postcodeInput, setPostcodeInput] = useState(postcode);
   const [postcodeLoading, setPostcodeLoading] = useState(false);
   const [postcodeError, setPostcodeError] = useState("");
@@ -117,11 +117,11 @@ export function FilterBar() {
         <input
           type="text"
           placeholder="Search programmes..."
-          defaultValue={q}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") set("q", (e.target as HTMLInputElement).value || null);
+            if (e.key === "Enter") set("q", searchInput || null);
           }}
-          onBlur={(e) => set("q", e.target.value || null)}
           className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-2.5 pl-9 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
@@ -175,7 +175,7 @@ export function FilterBar() {
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          {(SECTORS as unknown as string[]).filter((s, i) => showAllSectors || i < 8 || activeSectors.includes(s)).map((s) => {
+          {(SECTORS as unknown as string[]).map((s) => {
             const isActive = activeSectors.includes(s);
             const hasSubs = !!SECTOR_HIERARCHY[s];
             const subSectors = SECTOR_HIERARCHY[s] ?? [];
@@ -230,12 +230,6 @@ export function FilterBar() {
               </div>
             );
           })}
-          <button
-            onClick={() => setShowAllSectors((v) => !v)}
-            className="mt-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            {showAllSectors ? "Show fewer" : `Show all ${(SECTORS as unknown as string[]).length} sectors`}
-          </button>
         </div>
       </div>
 
@@ -250,7 +244,6 @@ export function FilterBar() {
             value={postcodeInput}
             onChange={(e) => { setPostcodeInput(e.target.value); setPostcodeError(""); }}
             onKeyDown={(e) => { if (e.key === "Enter") resolvePostcode(postcodeInput); }}
-            onBlur={() => resolvePostcode(postcodeInput)}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-2 pl-8 pr-8 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none"
           />
           {postcodeLoading && (
@@ -262,6 +255,15 @@ export function FilterBar() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
             >
               <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+          {postcodeInput && !postcode && !postcodeLoading && (
+            <button
+              onClick={() => resolvePostcode(postcodeInput)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-indigo-400"
+              aria-label="Search postcode"
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
