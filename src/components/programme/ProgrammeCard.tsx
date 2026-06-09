@@ -67,17 +67,17 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
       {/* Stretched link — entire card is clickable */}
       <Link
         href={`/programme/${p.slug}`}
-        className="absolute inset-0 z-0 rounded-xl"
+        className="absolute inset-0 z-10 rounded-xl"
         aria-label={`View ${p.name}`}
       />
 
       {p.isSponsored && (
-        <div className="absolute right-3 top-3 z-10 rounded-full bg-indigo-600/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
+        <div className="absolute right-3 top-3 z-20 rounded-full bg-indigo-600/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
           Sponsored
         </div>
       )}
 
-      <div className="relative z-10 flex flex-1 flex-col p-5">
+      <div className="relative flex flex-1 flex-col p-5">
         {/* Header */}
         <div className="flex items-start gap-3">
           <div className={cn(
@@ -200,7 +200,7 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
             )}
           </div>
 
-          <span className="relative z-10 shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+          <span className="relative z-20 shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
             View →
           </span>
         </div>
