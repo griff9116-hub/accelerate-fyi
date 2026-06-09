@@ -70,6 +70,8 @@ interface MatchResult {
   matchReasons: string[];
   isFeatured: boolean;
   isSponsored: boolean;
+  applyUrl?: string | null;
+  websiteUrl?: string | null;
 }
 
 function StepHeader({ step, total }: { step: number; total: number }) {
@@ -331,10 +333,9 @@ export default function FindPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {results.map((r, i) => (
-                <Link
+                <div
                   key={r.id}
-                  href={`/programme/${r.slug}`}
-                  className="group block rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition-all hover:border-zinc-600 hover:bg-zinc-800/80"
+                  className="group relative rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition-all hover:border-zinc-600 hover:bg-zinc-800/80"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -374,7 +375,25 @@ export default function FindPage() {
                       Investment: <span className="text-zinc-300">{formatInv(r.investmentMin, r.investmentMax, r.currency)}</span>
                     </p>
                   )}
-                </Link>
+                  <div className="mt-3 flex items-center gap-2">
+                    {(r.applyUrl || r.websiteUrl) && (
+                      <a
+                        href={r.applyUrl ?? r.websiteUrl ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative z-10 flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500 transition-colors"
+                      >
+                        Apply <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                    <Link
+                      href={`/programme/${r.slug}`}
+                      className="relative z-10 flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-700 transition-colors"
+                    >
+                      View details <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
               ))}
             </div>
           )}

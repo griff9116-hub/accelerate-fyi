@@ -111,9 +111,9 @@ export function Navbar() {
           <Link
             href="/match-deck"
             onClick={() => setOpen(false)}
-            className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2.5 text-sm font-medium text-zinc-300"
+            className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
           >
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4 mr-2" />
             Match my deck
           </Link>
           <Link
@@ -130,7 +130,7 @@ export function Navbar() {
             className="mt-2 flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white"
           >
             <Bell className="h-4 w-4" />
-            Get deadline alerts
+            Get alerts
           </Link>
         </div>
       )}

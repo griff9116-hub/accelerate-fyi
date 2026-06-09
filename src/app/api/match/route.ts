@@ -165,6 +165,7 @@ export async function POST(req: Request) {
         investmentMin: true, investmentMax: true, equityTaken: true,
         applicationDeadline: true, logoUrl: true,
         isFeatured: true, isSponsored: true,
+        applyUrl: true, websiteUrl: true,
       },
     });
 

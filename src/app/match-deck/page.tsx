@@ -32,6 +32,8 @@ interface ProgrammeResult {
   description: string;
   fitScore: number;
   fitReasons: string[];
+  applyUrl?: string | null;
+  websiteUrl?: string | null;
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -364,12 +366,24 @@ export default function MatchDeckPage() {
                   </div>
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <ScoreBadge score={p.fitScore} />
-                    <Link
-                      href={`/programme/${p.slug}`}
-                      className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"
-                    >
-                      View <ExternalLink className="h-3 w-3" />
-                    </Link>
+                    <div className="flex gap-2">
+                      {(p.applyUrl || p.websiteUrl) && (
+                        <a
+                          href={p.applyUrl ?? p.websiteUrl ?? "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 rounded-lg bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-indigo-500 transition-colors"
+                        >
+                          Apply <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                      <Link
+                        href={`/programme/${p.slug}`}
+                        className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-300"
+                      >
+                        Details <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

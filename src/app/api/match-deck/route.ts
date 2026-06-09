@@ -122,6 +122,8 @@ Return exactly this JSON structure:
       equityTaken: true,
       currency: true,
       description: true,
+      applyUrl: true,
+      websiteUrl: true,
     },
   });
 
