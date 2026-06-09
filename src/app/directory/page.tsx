@@ -149,14 +149,26 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   const activeFilterCount = [sp.type, sp.sectors, sp.stage, sp.country, sp.location, sp.seis, sp.eis, sp.remote, sp.postcode].filter(Boolean).length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">UK & European Programme Directory</h1>
-        <p className="mt-1 text-zinc-500">
-          {total} programme{total !== 1 ? "s" : ""} found
-          {hasFilters ? " matching your filters" : ""}
-        </p>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      {/* Directory header */}
+      <div className="border-b border-zinc-800 py-8">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">UK &amp; European Programme Directory</h1>
+            <p className="mt-1 text-zinc-500">
+              <span className="font-medium text-zinc-300">{total}</span> programme{total !== 1 ? "s" : ""}
+              {hasFilters ? " matching your filters" : " across the UK and Europe"}
+            </p>
+          </div>
+          {hasFilters && (
+            <a href="/directory" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+              Clear filters
+            </a>
+          )}
+        </div>
       </div>
+
+      <div className="py-8">
 
       <div className="flex gap-8">
         {/* Sidebar */}
