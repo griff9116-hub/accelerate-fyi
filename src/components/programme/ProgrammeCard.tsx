@@ -67,7 +67,7 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
       {/* Stretched link — entire card is clickable */}
       <Link
         href={`/programme/${p.slug}`}
-        className="absolute inset-0 z-0 rounded-xl"
+        className="absolute inset-0 rounded-xl"
         aria-label={`View ${p.name}`}
       />
 
@@ -77,7 +77,7 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
         </div>
       )}
 
-      <div className="relative z-10 flex flex-1 flex-col p-5">
+      <div className="pointer-events-none relative flex flex-1 flex-col p-5">
         {/* Header */}
         <div className="flex items-start gap-3">
           <div className={cn(
@@ -105,7 +105,7 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
               <button
                 onClick={(e) => { e.preventDefault(); toggle(); }}
                 aria-label={isSaved ? "Remove from saved" : "Save programme"}
-                className="relative z-20 shrink-0 rounded-md p-1 text-zinc-600 transition-colors hover:text-indigo-400"
+                className="pointer-events-auto relative z-10 shrink-0 rounded-md p-1 text-zinc-600 transition-colors hover:text-indigo-400"
               >
                 {isSaved
                   ? <BookmarkCheck className="h-4 w-4 text-indigo-400" />
@@ -200,7 +200,7 @@ export function ProgrammeCard({ programme: p }: { programme: ProgrammeCardData }
             )}
           </div>
 
-          <span className="relative z-10 shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+          <span className="shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
             View →
           </span>
         </div>
