@@ -212,3 +212,10 @@ export const TYPE_COLORS: Record<string, string> = {
   INCUBATOR: "bg-teal-500/10 text-teal-400 border-teal-500/20",
   GRANT: "bg-green-500/10 text-green-400 border-green-500/20",
 };
+// Icon size standards
+export const ICON_SIZES = {
+  sm: "h-3.5 w-3.5",  // For badges, small buttons
+  md: "h-4 w-4",      // For buttons, cards
+  lg: "h-5 w-5",      // For section headers, large cards
+  xl: "h-7 w-7",      // For hero section icons
+};
