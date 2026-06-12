@@ -167,11 +167,11 @@ export default async function HomePage() {
                 View all <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((p) => (
-                <ProgrammeCard key={p.slug} programme={p} />
-              ))}
-            </div>
+           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {featured.map((p) => (
+    <ProgrammeCard key={p.slug} programme={p} />
+  ))}
+</div>
           </div>
         </section>
       )}
