@@ -80,24 +80,20 @@ export default async function HomePage() {
               "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.25) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32">
+       <div className="relative mx-auto max-w-full sm:max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
           <div className="max-w-3xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-300">
               <Zap className="h-3.5 w-3.5" />
               {stats.total} programmes tracked across the UK &amp; Europe
             </div>
-            <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Find the right{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                accelerator
-              </span>{" "}
-              for your startup
-            </h1>
-            <p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-400">
-              Stop joining whatever programme is in front of you. Search and filter every accelerator,
-              venture studio, and investor across the UK and Europe by sector, stage, location,
-              SEIS/EIS eligibility, and more.
-            </p>
+           <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+  Find the right <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">accelerator</span> for your startup
+</h1>
+<p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-300">
+  Stop joining whatever programme is in front of you. Search and filter every accelerator,
+  venture studio, and investor across the UK and Europe by sector, stage, location,
+  SEIS/EIS eligibility, and more.
+</p>
             <div className="flex flex-wrap gap-3">
               <Button href="/find" size="lg">
                 Find my match <Zap className="h-4 w-4" />
@@ -115,28 +111,24 @@ export default async function HomePage() {
       </section>
 
       {/* ── Stats bar ───────────────────────────────────────────────────── */}
-      <section className="border-b border-zinc-800 bg-zinc-900/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid grid-cols-2 divide-x divide-zinc-800 sm:grid-cols-4">
-            {[
-              { label: "Accelerators", value: stats.byType["ACCELERATOR"] ?? 0, icon: Rocket },
-              { label: "Venture Studios", value: stats.byType["VENTURE_STUDIO"] ?? 0, icon: Building2 },
-              { label: "Incubators", value: stats.byType["INCUBATOR"] ?? 0, icon: Lightbulb },
-              { label: "Grants & Other", value: (stats.byType["ANGEL_NETWORK"] ?? 0) + (stats.byType["GRANT"] ?? 0), icon: Award },
-            ].map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center justify-center gap-3 px-6 py-5">
-                <div className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600/10 border border-indigo-500/20">
-                  <Icon className="h-4 w-4 text-indigo-400" />
-                </div>
-                <div className="text-center sm:text-left">
-                  <p className="text-2xl font-bold text-white">{value}</p>
-                  <p className="text-xs text-zinc-500">{label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+     <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-zinc-800">
+  {[
+    { label: "Accelerators", value: stats.byType["ACCELERATOR"] ?? 0, icon: Rocket },
+    { label: "Venture Studios", value: stats.byType["VENTURE_STUDIO"] ?? 0, icon: Building2 },
+    { label: "Incubators", value: stats.byType["INCUBATOR"] ?? 0, icon: Lightbulb },
+    { label: "Grants & Other", value: (stats.byType["ANGEL_NETWORK"] ?? 0) + (stats.byType["GRANT"] ?? 0), icon: Award },
+  ].map(({ label, value, icon: Icon }) => (
+    <div key={label} className="flex items-center justify-center gap-3 px-4 py-3 sm:px-6 sm:py-5">
+      <div className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600/10 border border-indigo-500/20">
+        <Icon className="h-4 w-4 text-indigo-400" />
+      </div>
+      <div className="text-center sm:text-left">
+        <p className="text-xl sm:text-2xl font-bold text-white">{value}</p>
+        <p className="text-xs text-zinc-500">{label}</p>
+      </div>
+    </div>
+  ))}
+</div>
 
       {/* ── How it works ────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
@@ -175,11 +167,11 @@ export default async function HomePage() {
                 View all <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((p) => (
-                <ProgrammeCard key={p.slug} programme={p} />
-              ))}
-            </div>
+           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {featured.map((p) => (
+    <ProgrammeCard key={p.slug} programme={p} />
+  ))}
+</div>
           </div>
         </section>
       )}
