@@ -80,24 +80,20 @@ export default async function HomePage() {
               "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.25) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32">
+       <div className="relative mx-auto max-w-full sm:max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
           <div className="max-w-3xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-300">
               <Zap className="h-3.5 w-3.5" />
               {stats.total} programmes tracked across the UK &amp; Europe
             </div>
-            <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Find the right{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                accelerator
-              </span>{" "}
-              for your startup
-            </h1>
-            <p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-400">
-              Stop joining whatever programme is in front of you. Search and filter every accelerator,
-              venture studio, and investor across the UK and Europe by sector, stage, location,
-              SEIS/EIS eligibility, and more.
-            </p>
+           <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+  Find the right <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">accelerator</span> for your startup
+</h1>
+<p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-300">
+  Stop joining whatever programme is in front of you. Search and filter every accelerator,
+  venture studio, and investor across the UK and Europe by sector, stage, location,
+  SEIS/EIS eligibility, and more.
+</p>
             <div className="flex flex-wrap gap-3">
               <Button href="/find" size="lg">
                 Find my match <Zap className="h-4 w-4" />
